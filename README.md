@@ -63,3 +63,5 @@ $ npm run test:cov
 ▶︎ 초기 세팅
 - 새 프로젝트 디렉토리 생성(@nestjs/cli -> nest new 프로젝트이름 or ./)
 - 핫 리로딩 설정(https://docs.nestjs.kr/recipes/hot-reload)
+- dotenv 설정
+- Logger middleware 설정
