@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { JoinRequestDto } from './dto/join.request.dto';
 import { UsersService } from './users.service';
 
@@ -24,7 +24,9 @@ export class UsersController {
     }
 
     @Post('logOut')
-    logOut(@Req() req) {
+    logOut(@Req() req, @Res() res) {
         req.logOut();
+        res.clearCookie('connect.sid', { httpOnly: true });
+        res.send('ok');
     }
 }
