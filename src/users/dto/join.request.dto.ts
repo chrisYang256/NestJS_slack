@@ -1,7 +1,4 @@
-export class JoinRequestDto {
-    public email: string;
+import { UserDto } from "src/common/dto/user.dto";
 
-    public nickname: string;
+export class JoinRequestDto extends UserDto {}
 
-    public password: string;
-}

@@ -65,3 +65,10 @@ $ npm run test:cov
 - 핫 리로딩 설정(https://docs.nestjs.kr/recipes/hot-reload)
 - dotenv 설정
 - Logger middleware 설정
+
+<br/>
+
+▶︎ API 설계, decorator, interceptor
+- module, controller, service, dto 생성
+- body, query, param 조작 방법
+- controller return과 respons 사이의 interceptor
