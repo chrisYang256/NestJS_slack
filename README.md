@@ -68,6 +68,7 @@ $ npm run test:cov
 
 <br/>
 
-▶︎ API 설계
+▶︎ API 설계, decorator, interceptor
 - module, controller, service, dto 생성
 - body, query, param 조작 방법
+- controller return과 respons 사이의 interceptor

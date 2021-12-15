@@ -1,9 +1,12 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { GetUser } from 'src/common/decorator/user.decorator';
+import { UndefindToNullInterceptor } from 'src/common/interceptors/undefinedToNull.interceptor';
 import { JoinRequestDto } from './dto/join.request.dto';
 import { UserWithIdDto } from './dto/user.response.dto';
 import { UsersService } from './users.service';
 
+@UseInterceptors(UndefindToNullInterceptor) // 개별 라우터에 붙이면 각각 적용됨.
 @ApiTags('USER')
 @Controller('api/users')
 export class UsersController {
@@ -17,8 +20,8 @@ export class UsersController {
     })
     @ApiOperation({ summary: '내 정보 조회' }) // swagger decorator
     @Get()
-    getUsers(@Req() req) {
-        return req.user
+    getUsers(@GetUser() user) {
+        return user;
     }
 
     @ApiOperation({ summary: '회원가입' })
@@ -32,9 +35,10 @@ export class UsersController {
         type: UserWithIdDto
     })
     @ApiOperation({ summary: '로그인' })
+    @UseGuards()
     @Post('logIn')
-    logIn(@Req() req ) {
-        return req.user
+    logIn(@GetUser() user ) {
+        return user;
     }
 
     @ApiOperation({ summary: '로그아웃'})
