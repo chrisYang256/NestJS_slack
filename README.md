@@ -40,9 +40,6 @@ $ npm run start
 
 # watch mode
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
 ## Test
@@ -58,7 +55,7 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Contents
+## Slack clone coding 강의 학습
 
 ▶︎ 초기 세팅
 - 새 프로젝트 디렉토리 생성(@nestjs/cli -> nest new 프로젝트이름 or ./)
@@ -72,3 +69,9 @@ $ npm run test:cov
 - module, controller, service, dto 생성
 - body, query, param 조작 방법
 - controller return과 respons 사이의 interceptor
+
+<br/>
+
+▶︎ Entity
+- typORM(관계 설정)
+- Swagger 연동
