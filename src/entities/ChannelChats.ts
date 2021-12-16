@@ -24,12 +24,13 @@ export class ChannelChats {
     @Column('int', { name: 'ChannelId', nullable: true })
     ChannelId: number | null;
 
+    // 서로 반대 테이블 정보를 넣으주면 됨
     @ManyToOne(() => Users, (users) => users.ChannelChats, {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',  // soft delete를 위한듯?2
     })
     @JoinColumn([{ name: 'UserId', referencedColumnName: 'id' }])
-    User: Users
+    User: Users // user column이 생김
 
     @ManyToOne(() => Channels, (channels) => channels.ChannelChats, {
         onUpdate: 'CASCADE',

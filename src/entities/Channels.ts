@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { ChannelChats } from "./Channelchats";
 import { ChannelMembers } from "./ChannelMembers";
 import { Users } from "./Users";
 import { Workspaces } from "./Workspaces";
+import { ChannelChats } from "./ChannelChats";
 
 // @Index('WorkspaceId', ['WorkspaceId'], {})
 @Entity({ schema: 'slack', name: 'channels' })
