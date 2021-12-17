@@ -25,9 +25,9 @@ export class UsersController {
     }
 
     @ApiOperation({ summary: '회원가입' })
-    @Post()
-    signIn(@Body() data: JoinRequestDto) { // data가 아니라 body로 해도 되고 자유.
-        this.usersService.postUsers(data.email, data.nickname, data.password);
+    @Post('/signin')
+    async signIn(@Body() data: JoinRequestDto) { // data가 아니라 body로 해도 되고 자유.
+        await this.usersService.signIn(data.email, data.nickname, data.password);
     }
 
     @ApiOkResponse({

@@ -73,5 +73,11 @@ $ npm run test:cov
 <br/>
 
 ▶︎ Entity
-- typORM(관계 설정)
+- typORM 관계 설정 / db configuration
 - Swagger 연동
+- seeding, migration
+
+<br/>
+
+▶︎ API 세부 구현
+- custom Exception filter
