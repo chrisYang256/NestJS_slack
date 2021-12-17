@@ -19,7 +19,7 @@ export class Users {
     @Column('varchar', { name: 'email', unique: true, length: 30 })
     email: string;
 
-    @ApiProperty({ example: '헬로 네스트', description: '유저 별명'})
+    @ApiProperty({ example: '코리아 핫-가이', description: '유저 별명'})
     @Column('varchar', { name: 'nickname', length: 10 })
     nickname: string;
 

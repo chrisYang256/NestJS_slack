@@ -1,11 +1,9 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { UserDto } from "src/common/dto/user.dto";
+import { PickType } from "@nestjs/swagger";
+import { Users } from "src/entities/Users";
 
-export class UserWithIdDto extends UserDto {
-    @ApiProperty({
-        example: 12,
-        description: '아이디',
-        required: true
-    })
-    public id: number;
-}
+export class UserWithIdDto extends PickType(Users, [
+    'id', 
+    'nickname', 
+    'email', 
+    'password'
+] as const) {}

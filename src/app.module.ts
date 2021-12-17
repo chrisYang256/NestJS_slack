@@ -10,6 +10,8 @@ import { ChannelsModule } from './channels/channels.module';
 import { DmsModule } from './dms/dms.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as ormconfig from 'ormconfig';
+import { APP_FILTER } from '@nestjs/core';
+import { HttpExceptionFilter } from './http-exception.filter';
 
  @Module({
   imports: [
@@ -23,7 +25,13 @@ import * as ormconfig from 'ormconfig';
     DmsModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any { // Logger 미들웨어 적용, 미들웨어들은 consumer에 연결함
