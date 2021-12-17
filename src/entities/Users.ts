@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { ChannelChats } from "./ChannelChats";
+import { ChannelChats } from "./CannelChats";
 import { ChannelMembers } from "./ChannelMembers";
 import { Channels } from "./Channels";
 import { DMs } from "./DMs";
