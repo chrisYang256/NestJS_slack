@@ -8,9 +8,20 @@ import { LoggerMiddleware } from './middlewares/logger.middlewares';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { ChannelsModule } from './channels/channels.module';
 import { DmsModule } from './dms/dms.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import * as ormconfig from 'ormconfig';
 
  @Module({
-  imports: [ConfigModule.forRoot(), UsersModule, WorkspacesModule, ChannelsModule, DmsModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }), 
+    TypeOrmModule.forRoot(ormconfig),
+    UsersModule, 
+    WorkspacesModule, 
+    ChannelsModule, 
+    DmsModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

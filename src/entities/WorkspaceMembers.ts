@@ -1,6 +1,6 @@
 // 중간 테이블
 
-import { Column, CreateDateColumn, Entity, In, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, UpdateDateColumn } from "typeorm";
 import { Users } from "./Users";
 import { Workspaces } from "./Workspaces";
 
@@ -29,12 +29,13 @@ export class WorkspaceMemebers {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
     })
-    @JoinColumn({ name: 'WorkspaceMemberId', referencedColumnName: 'id' })
+    @JoinColumn({ name: 'UserId', referencedColumnName: 'id' })
     User: Users
 
     @ManyToOne(() => Workspaces, workspaces => workspaces.WorkspaceMembers, {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
     })
+    @JoinColumn({ name: 'WorkspaceId', referencedColumnName: 'id' })
     Workspace: Workspaces;
 }

@@ -19,7 +19,7 @@ export class Workspaces {
     @Column('varchar', { name: 'url', length: 100 })
     url: string;
 
-    @CreateDateColumn()
+    @CreateDateColumn() // @Column('date', { defalut: () => 'CURRENT_TIMESTAMP'})와 같음
     createdAt: Date;
 
     @UpdateDateColumn()
