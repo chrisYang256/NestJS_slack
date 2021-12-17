@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ChannelChats } from "./CannelChats";
 import { ChannelMembers } from "./ChannelMembers";
@@ -15,14 +16,21 @@ export class Users {
     @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
     id: number;
 
+    @IsNotEmpty() // class-validator
+    @IsString()
+    @IsEmail()
     @ApiProperty({ example: 'maxsummer256@gmail.com', description: '회원 이메일'})
     @Column('varchar', { name: 'email', unique: true, length: 30 })
     email: string;
 
+    @IsNotEmpty()
+    @IsString()
     @ApiProperty({ example: '코리아 핫-가이', description: '유저 별명'})
     @Column('varchar', { name: 'nickname', length: 10 })
     nickname: string;
 
+    @IsNotEmpty()
+    @IsString()
     @ApiProperty({ example: '123abc@', description: '회원 비밀번호'})
     @Column('varchar', { name: 'password', length: 100, select: false }) // Hidden Columns : 열이 쿼리에 표시되지 않게 해줌.
     password: string;
