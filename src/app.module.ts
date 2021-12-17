@@ -1,8 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { AppService } from './app.service';
-import { AppController } from './app.controller';
 import { UsersModule } from './users/users.module';
 import { LoggerMiddleware } from './middlewares/logger.middlewares';
 import { WorkspacesModule } from './workspaces/workspaces.module';
@@ -24,9 +22,7 @@ import { HttpExceptionFilter } from './http-exception.filter';
     ChannelsModule, 
     DmsModule
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
