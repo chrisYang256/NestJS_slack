@@ -32,7 +32,7 @@ export class Users {
     @IsNotEmpty()
     @IsString()
     @ApiProperty({ example: '123abc@', description: '회원 비밀번호'})
-    @Column('varchar', { name: 'password', length: 100, select: false }) // Hidden Columns : 열이 쿼리에 표시되지 않게 해줌.
+    @Column('varchar', { name: 'password', length: 100, select: false }) // Hidden Columns : 열이 쿼리에 표시되지 않게 해줌.(보안)
     password: string;
 
     @CreateDateColumn() // 자동설정됨, https://typeorm.io/#/entities/special-columns

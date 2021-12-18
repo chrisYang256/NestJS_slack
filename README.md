@@ -81,4 +81,4 @@ $ npm run test:cov
 
 ▶︎ API 세부 구현
 - custom Exception filter
-- passport, bcrypt, serializer, guard
+- Authentication(passport, bcrypt, local serializer, guard)

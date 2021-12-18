@@ -37,6 +37,7 @@ async function bootstrap() {
     })
   )
   app.use(passport.initialize());
+  app.use(passport.session());
 
   await app.listen(port);
   console.log(`listening on port: ${port}`);
