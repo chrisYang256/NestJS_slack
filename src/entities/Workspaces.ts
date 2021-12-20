@@ -3,7 +3,7 @@ import { Channels } from "./Channels";
 import { DMs } from "./DMs";
 import { Mentions } from "./Mentions";
 import { Users } from "./Users";
-import { WorkspaceMemebers } from "./WorkspaceMembers";
+import { WorkspaceMembers } from "./WorkspaceMembers";
 
 // @Index('name', ['name'], { unique: true })
 // @Index('url', ['url'], { unique: true })
@@ -40,10 +40,10 @@ export class Workspaces {
     @OneToMany(() => Mentions, mentions => mentions.Workspace)
     Mentions: Mentions[];
 
-    @OneToMany(() => WorkspaceMemebers, workspacemembers => workspacemembers.Workspace, {
+    @OneToMany(() => WorkspaceMembers, workspacemembers => workspacemembers.Workspace, {
         cascade: ['insert'],
     })
-    WorkspaceMembers: WorkspaceMemebers[];
+    WorkspaceMembers: WorkspaceMembers[];
 
     @ManyToOne(() => Users, users => users.Workspaces, {
         onUpdate: 'CASCADE',
