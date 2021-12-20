@@ -6,7 +6,7 @@ import { Workspaces } from "./Workspaces";
 
 // @Index('UserId', ['UserId'], {})
 @Entity({ schema: 'slack', name: 'workspacemembers' })
-export class WorkspaceMemebers {
+export class WorkspaceMembers {
     // @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
     // id: number;
 

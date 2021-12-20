@@ -5,7 +5,7 @@ import { Channels } from "./src/entities/Channels";
 import { DMs } from "./src/entities/DMs";
 import { Mentions } from "./src/entities/Mentions";
 import { Users } from "./src/entities/Users";
-import { WorkspaceMemebers } from "./src/entities/WorkspaceMembers";
+import { WorkspaceMembers } from "./src/entities/WorkspaceMembers";
 import { Workspaces } from "./src/entities/Workspaces";
 import * as dotenv from 'dotenv';
 
@@ -25,7 +25,7 @@ const config: TypeOrmModuleOptions = {
         DMs,
         Mentions,
         Users,
-        WorkspaceMemebers,
+        WorkspaceMembers,
         Workspaces
     ],
     synchronize: false, // true -> 생성 -> false로 해야 데이터 안날림(기존DB삭제하고 새로 생성)

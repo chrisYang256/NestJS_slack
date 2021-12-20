@@ -6,7 +6,7 @@ import { ChannelMembers } from "./ChannelMembers";
 import { Channels } from "./Channels";
 import { DMs } from "./DMs";
 import { Mentions } from "./Mentions";
-import { WorkspaceMemebers } from "./WorkspaceMembers";
+import { WorkspaceMembers } from "./WorkspaceMembers";
 import { Workspaces } from "./Workspaces";
 
 // @Index('email', ['email'], { unique: true })
@@ -65,8 +65,8 @@ export class Users {
     @OneToMany(() => ChannelMembers, (channelmembers) => channelmembers.User)
     ChannelMembers: ChannelMembers[];
 
-    @OneToMany(() => WorkspaceMemebers, (workspacemembers) => workspacemembers.User)
-    WorkspaceMembers: WorkspaceMemebers[];
+    @OneToMany(() => WorkspaceMembers, (workspacemembers) => workspacemembers.User)
+    WorkspaceMembers: WorkspaceMembers[];
 
     @ManyToMany(() => Channels, (channels) => channels.Members)
     @JoinTable({

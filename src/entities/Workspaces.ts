@@ -1,9 +1,11 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString } from "class-validator";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Channels } from "./Channels";
 import { DMs } from "./DMs";
 import { Mentions } from "./Mentions";
 import { Users } from "./Users";
-import { WorkspaceMemebers } from "./WorkspaceMembers";
+import { WorkspaceMembers } from "./WorkspaceMembers";
 
 // @Index('name', ['name'], { unique: true })
 // @Index('url', ['url'], { unique: true })
@@ -13,9 +15,15 @@ export class Workspaces {
     @PrimaryGeneratedColumn({ type: 'int', name: 'int' })
     id: number;
 
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({ example: '3학년 1반 모여랏', description: '워크스페이스 이름'})
     @Column('varchar', { name: 'name', length: 20 })
     name: string;
 
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({ example: 'comeone3-1', description: 'url 주소'})
     @Column('varchar', { name: 'url', length: 100 })
     url: string;
 
@@ -40,10 +48,10 @@ export class Workspaces {
     @OneToMany(() => Mentions, mentions => mentions.Workspace)
     Mentions: Mentions[];
 
-    @OneToMany(() => WorkspaceMemebers, workspacemembers => workspacemembers.Workspace, {
+    @OneToMany(() => WorkspaceMembers, workspacemembers => workspacemembers.Workspace, {
         cascade: ['insert'],
     })
-    WorkspaceMembers: WorkspaceMemebers[];
+    WorkspaceMembers: WorkspaceMembers[];
 
     @ManyToOne(() => Users, users => users.Workspaces, {
         onUpdate: 'CASCADE',

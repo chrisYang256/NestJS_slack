@@ -82,3 +82,5 @@ $ npm run test:cov
 ▶︎ API 세부 구현
 - custom Exception filter
 - Authentication(passport, bcrypt, local serializer, guard)
+- Transaction 관리
+- typeorm query builder

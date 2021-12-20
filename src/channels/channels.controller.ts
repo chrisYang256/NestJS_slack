@@ -14,6 +14,11 @@ export class ChannelsController {
 
     }
 
+    @Get('/:id')
+    findChannelById() {
+        
+    }
+
     @Get('name')
     getSpecificChannel() {
 
