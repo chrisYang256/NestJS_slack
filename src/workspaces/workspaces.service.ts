@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { userInfo } from 'os';
 import { ChannelMembers } from 'src/entities/ChannelMembers';
 import { Channels } from 'src/entities/Channels';
 import { Users } from 'src/entities/Users';
@@ -51,7 +52,7 @@ export class WorkspacesService {
             workspaceMember.WorkspaceId = workspace.id;
     
             const channel = new Channels();
-            channel.name = '친구들 모여라~'
+            channel.name = '일반'
             channel.WorkspaceId = workspace.id
     
             const [, channelResults] = await Promise.all([
@@ -73,6 +74,13 @@ export class WorkspacesService {
         } finally {
             await queryRunner.release();
         }
+    }
+
+    async getWorkspaceMember(url: string, id: number) {
+        return this.usersRepository
+            .createQueryBuilder('user')
+            .where('user.id = :id', { id }) // sql함수가 없는 이런 간단한 경우는 .where( { id } ) 라고만 넣어도 되긴 함
+            .innerJoin('user.Workspaces', 'workspaces', 'workspaces.url = :url', { url }).getOne();
     }
 
     // Query Builder 써보기
@@ -98,5 +106,37 @@ export class WorkspacesService {
                     }
                 }
             */
+    }
+
+    // transaction 처리 전 상태
+    async createWorkspaceMembers(url: string, email: string) { // 초대
+        // this.workspacesRepository.createQueryBuilder('w').innerJoinAndSelect('w.Channels', 'c').getOne();
+        // typeorm은 join을 했다고 join한 테이블의 데이터를 가져오지 않기 때문에 joinAndSelec()를 써야함
+        const workspace = await this.WorkspacesRepository.findOne({
+            where: { url },
+            // relations: ['Channels'] 대신 join 사용해보기
+            join: {
+                alias: 'w', // alias: 'workspace'
+                innerJoinAndSelect: {
+                    c: 'w.Channels', // channels: 'w.channels'
+                },
+            },
+        });
+
+        const user = await this.usersRepository.findOne({ where: { email } });
+        if (!user) {
+            return null;
+        }
+
+        const workspaceMember = new WorkspaceMembers(); // 1. 워크스페이스 초대
+        workspaceMember.WorkspaceId = workspace.id;
+        workspaceMember.UserId = user.id;
+        await this.workspaceMembersRepository.save(workspaceMember);
+
+        const channelMember = new ChannelMembers(); // 2. 채널 초대
+        channelMember.UserId = user.id;
+        channelMember.ChannelId = workspace.Channels.find((v) => v.name === '일반').id;
+        await this.channelMembersRepository.save(channelMember);
+
     }
 }
