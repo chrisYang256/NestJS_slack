@@ -21,6 +21,18 @@ export class WorkspacesService {
         @InjectRepository(Users)
         private usersRepository: Repository<Users>
     ) {}
-
     
+    // async findById(id: number) {
+    //     return this.workspaceMembersRepository.findByIds( [id] );
+    // }
+    
+    async getMyWorkspaces(myId: number) {
+        return this.WorkspacesRepository.find({
+            where: { WorkspaceMembers: [{ UserId: myId }] }
+        });
+    }
+
+    async createWorkspace(userId: number, name: string, url: string) {
+
+    }
 }
