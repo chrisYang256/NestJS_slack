@@ -11,6 +11,8 @@ import * as ormconfig from 'ormconfig';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './http-exception.filter';
 import { AuthModule } from './auth/auth.module';
+import { EventsModule } from './events/events.module';
+
 
  @Module({
   imports: [
@@ -22,7 +24,8 @@ import { AuthModule } from './auth/auth.module';
     WorkspacesModule, 
     ChannelsModule, 
     DmsModule,
-    AuthModule
+    AuthModule,
+    EventsModule
   ],
   providers: [
     {

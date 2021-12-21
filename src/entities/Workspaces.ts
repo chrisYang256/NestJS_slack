@@ -12,7 +12,7 @@ import { WorkspaceMembers } from "./WorkspaceMembers";
 // @Index('OwnerId', ['OwnerId'], {})
 @Entity({ schema: 'slack', name: 'workspaces' })
 export class Workspaces {
-    @PrimaryGeneratedColumn({ type: 'int', name: 'int' })
+    @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
     id: number;
 
     @IsNotEmpty()
