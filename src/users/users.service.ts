@@ -17,20 +17,21 @@ export class UsersService {
     async signIn(email: string, nickname: string, password: string) {
         const queryRunner = this.connection.createQueryRunner();
         await queryRunner.connect();
-        await queryRunner.startTransaction();
-  
+        
         // ... this.userRepository.findOne({ where: { email } });처럼 this를 통해 Repository를 가져오는 경우
         // TypeOrmModule.forRoot(ormconfig)를 통해 맺어지기 때문에
         // await queryRunner.manager로 Repository를 가져와 관계를 맺어줘야 transaction이 적용되어 맺어짐.
         const user = await this.userRepository.findOne({ where: { email } });
-
+        
         if (user) {
             throw new ForbiddenException('이미 가입한 이메일입니다.'); // HttpException('', status)을 상속받은 exception
         }
-
+        
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(password, salt);
-
+        
+        await queryRunner.startTransaction();
+        
         try {
             const enteredUser = await queryRunner.manager.getRepository(Users).save({
                 email,

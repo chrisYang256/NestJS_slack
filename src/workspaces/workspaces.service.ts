@@ -85,7 +85,7 @@ export class WorkspacesService {
 
     // Query Builder 써보기
     // 해당 url을 가진 workspace 안의 사용자 가져오기(~~ 안의, ~~의: Join). workspaceMembers 안의 ~ -> innnerJoin
-    async getWorkspaceMembers(url: string) {
+    async getAllMemberListFromWrokspace(url: string) {
         this.usersRepository
             .createQueryBuilder('u') // 'u'는 uersRepository의 별명, 즉 Users Entity에 대한 별명
             .innerJoin('u.WorkspaceMembers', 'm') // 'm'은 u.workspaceMembers에 대한 별명(.workspaceMembers는 내가 Entity에 정의한 값)

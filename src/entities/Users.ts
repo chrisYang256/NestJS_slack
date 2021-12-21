@@ -70,7 +70,7 @@ export class Users {
 
     @ManyToMany(() => Channels, (channels) => channels.Members)
     @JoinTable({
-        name: 'channermembers',
+        name: 'channelmembers',
         joinColumn: {
             name: 'UserId',
             referencedColumnName: 'id',
@@ -84,7 +84,7 @@ export class Users {
 
     @ManyToMany(() => Workspaces, (workspaces) => workspaces.Members)
     @JoinTable({
-        name: 'workspacesmembers',
+        name: 'workspacemembers',
         joinColumn: {
             name: 'UserId',
             referencedColumnName: 'id',

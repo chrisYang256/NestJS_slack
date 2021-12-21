@@ -1,3 +1,5 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString } from "class-validator";
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Channels } from "./Channels";
 import { Users } from "./Users";
@@ -9,6 +11,9 @@ export class ChannelChats {
     @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
     id: number;
 
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({ description: '메시지 내용', example: '안녕하세요 반가워요!'})
     @Column('text', { name: 'content' })
     content: string;
 
@@ -36,6 +41,6 @@ export class ChannelChats {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
     })
-    @JoinColumn([{ name: 'ChannerId', referencedColumnName: 'id' }])
+    @JoinColumn([{ name: 'ChannelId', referencedColumnName: 'id' }])
     Channel: Channels;
 }
