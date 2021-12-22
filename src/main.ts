@@ -7,14 +7,32 @@ import session from 'express-session'
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
+import path from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule); // generic for useStaticAssets
   const port = process.env.PORT || 3000;
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe( { transform: true }));
+
+  if (process.env.NODE_ENV === 'production') { 
+    app.enableCors({ 
+      origin: ['https://nest-slack.com'], // https://github.com/expressjs/cors#configuration-options
+      credentials: true
+    });
+  } else {
+    app.enableCors({
+      origin: true,
+      credentials: true,
+    });
+  }
+
+  app.useStaticAssets(path.join(__dirname, '..', 'file-uploads'), { // multer 관련 파일 경로를 지정해줌
+    prefix: '/file-uploads'
+  }); 
 
   const config = new DocumentBuilder()
     .setTitle('nest-slack API')

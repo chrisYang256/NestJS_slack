@@ -158,4 +158,40 @@ export class ChannelsService {
         // socket.io로 해당 워크스페이스 채널 사용자들에게 전송
         this.eventsGateway.server.to(`/ws-${url}-${channel.id}`).emit('message', chatWithUser);
     }
+
+    // transaction 관리 필요
+    async createWorkspaceChannelImage(
+        url: string,
+        name: string,
+        files: Express.Multer.File[],
+        myId: number
+    ) {
+        const channel = await this.channelsRepository
+            .createQueryBuilder('channel')
+            .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
+            .where('channel.name = :name', { name })
+            .getOne();
+        
+            if (!channel) {
+                throw new NotFoundException('채널이 존재하지 않습니다.');
+            }
+
+        for (let i = 0; i < files.length; i++) { // 파일이 여러개일 때 처리
+            const chat = await this.channelchatsRepository.save({ // 채팅 저장
+                content: files[i].path,
+                UserId: myId,
+                ChannelId: channel.id
+            });
+
+            const chatWithUser = await this.channelchatsRepository.findOne({ // 저장한 채팅 불러옴
+                where: { id: chat.id },
+                relations: ['User', 'Channel']
+            });
+
+            this.eventsGateway.server // 1. socket.io로 
+                // .of(`/ws-${url})
+                .to(`/ws-${url}-${chatWithUser.ChannelId}`) // 2. 불러온 채팅정보로 해당 워크스페이스와 채널을 찾고
+                .emit('message', chatWithUser) // 3. 메시지로 전송
+        }   
+    }
 }
