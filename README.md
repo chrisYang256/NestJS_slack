@@ -84,3 +84,15 @@ $ npm run test:cov
 - Authentication(passport, bcrypt, local serializer, guard)
 - Transaction 관리
 - typeorm query builder
+- multer & static file
+
+<br/>
+
+▶︎ 배포준비
+- build
+- pm2
+- cross-env
+
+<br/>
+
+▶︎ 유닛 테스트

@@ -12,7 +12,7 @@ try { // 파일 업로드를 위한 저장소 설정
     fs.readdirSync('file-uploads');
 } catch (error) {
     console.error('::: create file-uploads folder!');
-    fs.mkdirSync('uploads');
+    fs.mkdirSync('file-uploads');
 }
 
 @ApiTags('CHANNEL')
@@ -66,7 +66,7 @@ export class ChannelsController {
 
     @Post(':name/images')
     @UseInterceptors( // nest decorator 방식의 multer 설정
-        FilesInterceptor('image', 10, {
+        FilesInterceptor('image', 10, { // 이미지 1개만: file~, 이미지 여러개: files~
             storage: multer.diskStorage({ 
                 destination(req, file, cb) { 
                     cb(null, 'file-uploads/'); 
@@ -78,9 +78,9 @@ export class ChannelsController {
             }),
             limits: { fileSize: 5 * 1024 * 1024 }
         })
-    ) // 이미지 1개만: file~, 이미지 여러개: files~
+    ) 
     createWorkspaceChannelImage(
-        @UploadedFiles() file: Express.Multer.File[],
+        @UploadedFiles() file: Array<Express.Multer.File>, // Express.Multer.File[],
         @Param('url') url: string,
         @Param('name') name: string,
         @GetUser() user  
