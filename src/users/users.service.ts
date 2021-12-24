@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/Users';
 import { Connection, Repository } from 'typeorm';
@@ -10,18 +10,29 @@ import { ChannelMembers } from 'src/entities/ChannelMembers';
 export class UsersService {
     constructor(
         @InjectRepository(Users)
-        private userRepository: Repository<Users>,
+        private usersRepository: Repository<Users>,
+        @InjectRepository(WorkspaceMembers)
+        private workspaceMembers: Repository<WorkspaceMembers>,
+        @InjectRepository(ChannelMembers)
+        private channelmemebers: Repository<ChannelMembers>,
         private connection: Connection // query runner transaction controll https://docs.nestjs.kr/techniques/database#transactions
     ) {}
 
-    async signIn(email: string, nickname: string, password: string) {
+    async findByEmail(email: string) {
+        return this.usersRepository.findOne({
+            where: { email },
+            select: [ 'id', 'email', 'password']
+        });
+    }
+
+    async signUp(email: string, nickname: string, password: string) {
         const queryRunner = this.connection.createQueryRunner();
         await queryRunner.connect();
         
         // ... this.userRepository.findOne({ where: { email } });처럼 this를 통해 Repository를 가져오는 경우
         // TypeOrmModule.forRoot(ormconfig)를 통해 맺어지기 때문에
         // await queryRunner.manager로 Repository를 가져와 관계를 맺어줘야 transaction이 적용되어 맺어짐.
-        const user = await this.userRepository.findOne({ where: { email } });
+        const user = await this.usersRepository.findOne({ where: { email } });
         
         if (user) {
             throw new ForbiddenException('이미 가입한 이메일입니다.'); // HttpException('', status)을 상속받은 exception
