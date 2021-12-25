@@ -13,7 +13,7 @@ import { onlineMap } from './onlineMap';
 
 @WebSocketGateway({ namespace: /\/ws-.+/ }) // 사람들이 방 이름을 무엇으로 만들지 모르기 때문에 정규표현식 사용
 export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer() public server: Server;
+  @WebSocketServer() public server: Server; // public ~~라는 것은 eventsGateway.server로 사용할 수 있다는 의미
 
   @SubscribeMessage('test')
   handleMessage(@MessageBody() data: string) {
@@ -41,7 +41,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
   handleConnection(@ConnectedSocket() socket: Socket): any {
     console.log('connected:::', socket.nsp.name);
-    if (!onlineMap[socket.nsp.name]) { // onlineMap : 워크스페이스 참가자 목록을 실시간으로 담고있는 객체
+    if (!onlineMap[socket.nsp.name]) { 
       onlineMap[socket.nsp.name] = {};
     }
     socket.emit('hello:::', socket.nsp.name);
