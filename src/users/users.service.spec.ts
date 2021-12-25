@@ -29,7 +29,7 @@ describe('UsersService', () => { // describe: 파일단위의 테스트 묶음.(
         UsersService,
         {
           provide: getRepositoryToken(Users), // 1. 실재 db를 건드리지 않기 위해 이 부분을 설정해 가짜로 repository를 만들어주면 됨
-          // 함수는 useFactory, 일반 값은 useValue.. 모두 class로 목킹하는 것은 아님.
+          // 함수는 useFactory, 일반 값은 useValue.. 모두 class로 목킹해야 하는 것은 아님.
           useClass: MockUserRepository, // 2. 테스트 대상 로직에서 usersRepository가 MockUserRepository로 대체됨.
         },
         {

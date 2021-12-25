@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import * as ormconfig from 'ormconfig';
 
 import { UsersModule } from './users/users.module';
 import { LoggerMiddleware } from './middlewares/logger.middlewares';
@@ -7,7 +8,6 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
 import { ChannelsModule } from './channels/channels.module';
 import { DmsModule } from './dms/dms.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as ormconfig from 'ormconfig';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './http-exception.filter';
 import { AuthModule } from './auth/auth.module';
@@ -18,6 +18,7 @@ import { EventsModule } from './events/events.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: process.env.NODE_ENV == 'dev' ? '.env.dev' : '.env.test',
     }), 
     TypeOrmModule.forRoot(ormconfig),
     UsersModule, 
