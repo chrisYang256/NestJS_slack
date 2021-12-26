@@ -1,13 +1,13 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { ChannelChats } from "./src/entities/CannelChats";
-import { ChannelMembers } from "./src/entities/ChannelMembers";
-import { Channels } from "./src/entities/Channels";
-import { DMs } from "./src/entities/DMs";
-import { Mentions } from "./src/entities/Mentions";
-import { Users } from "./src/entities/Users";
-import { WorkspaceMembers } from "./src/entities/WorkspaceMembers";
-import { Workspaces } from "./src/entities/Workspaces";
 import * as dotenv from 'dotenv';
+import { ChannelChats } from "./entities/CannelChats";
+import { ChannelMembers } from "./entities/ChannelMembers";
+import { Channels } from "./entities/Channels";
+import { DMs } from "./entities/DMs";
+import { Mentions } from "./entities/Mentions";
+import { Users } from "./entities/Users";
+import { WorkspaceMembers } from "./entities/WorkspaceMembers";
+import { Workspaces } from "./entities/Workspaces";
 
 dotenv.config();
 
@@ -15,7 +15,7 @@ const config: TypeOrmModuleOptions = {
     type: 'mysql',
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT),
-    username: process.env.BD_USERNAME,
+    username: 'root',
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     entities: [ // "entities/*.js" 처럼 경로로도 가능, 다양한 repository 패턴 존재

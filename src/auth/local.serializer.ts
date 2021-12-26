@@ -22,7 +22,7 @@ export class LocalSerializer extends PassportSerializer {
                 id: +userId,
                 }, {
                 select: ['id', 'email', 'nickname'],
-                relations: ['Workspaces'] // typrorm 테이블 조인하는 방법(form User entity)
+                relations: ['Workspaces'] // typrorm 테이블 조인하는 방법(from User entity)
             })
             .then((user) => {
                 console.log('user', user);

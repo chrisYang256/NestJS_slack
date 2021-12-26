@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import * as ormconfig from 'ormconfig';
+import * as ormconfig from './ormconfig';
 
 import { UsersModule } from './users/users.module';
 import { LoggerMiddleware } from './middlewares/logger.middlewares';
@@ -18,7 +18,7 @@ import { EventsModule } from './events/events.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV == 'dev' ? '.env.dev' : '.env.test',
+      envFilePath: '.env'
     }), 
     TypeOrmModule.forRoot(ormconfig),
     UsersModule, 

@@ -31,13 +31,6 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
-  });
-
   it('/users/login (POST)', (done) => {
     return request(app.getHttpServer())
       .post('/api/users/login')
@@ -46,5 +39,5 @@ describe('AppController (e2e)', () => {
         passord: '123abc@'
       })
       .expect(201, done); // 비동기 테스트는 done을 붙여줘여함.
-  })
+  });
 });
