@@ -21,41 +21,46 @@ export class ChannelsService {
         private channelchatsRepository: Repository<ChannelChats>,
         @InjectRepository(Users)
         private usersRepository: Repository<Users>,
-        private eventsGateway: EventsGateway,
+        private readonly eventsGateway: EventsGateway,
     ) {}
 
     async findChannelById(Id: number) {
         // return this.channelsRepository.findOne({ where: { id} });
         return this.channelsRepository.createQueryBuilder('channels').where('id').getOne();
     }
-
-    async getAllChannels(url: string, myId: number) {
+    
+    async getWorkspaceChannels(url: string, myId: number) {
         return this.channelsRepository
-            .createQueryBuilder('channels') // alias by Channels entity
-            .innerJoinAndSelect(
-                'channels.Channelmembers',
-                'channelMembers', // alias by ChannelMembers entity
-                'channelMembers.userId = :userId',
-                { myId }
-            )
-            .innerJoinAndSelect(
-                'channels.Workspace',
-                'workspace',
-                'workspace.url = :url',
-                { url }
-            )
-            .getMany();
+        .createQueryBuilder('channels') // alias by Channels entity
+        .innerJoinAndSelect(
+            'channels.Channelmembers',
+            'channelMembers', // alias by ChannelMembers entity
+            'channelMembers.userId = :myId',
+            { myId }
+        )
+        .innerJoinAndSelect(
+            'channels.Workspace',
+            'workspace',
+            'workspace.url = :url',
+            { url }
+        )
+        .getMany();
     }
 
     async getWorkspaceChannel(url: string, name: string) {
-        return this.channelsRepository.findOne({
-            where: { name },
-            relations: ['Workspace'] // workspace까지 가져오기
-        });
+        // return this.channelsRepository.findOne({
+        //     where: { name },
+        //     relations: ['Workspace'] // workspace까지 가져오기
+        // });
+        return this.channelsRepository
+            .createQueryBuilder('channel')
+            .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
+            .where('channel.name = :name', { name })
+            .getOne();
     }
 
     // transaction 관리 필요
-    async createWorkspaceChannels(url: string, name: string, myId: number) {
+    async createWorkspaceChannel(url: string, name: string, myId: number) {
         const workspace = await this.wrorkspaceRepository.findOne({ where: { url }});
 
         const channel = await this.channelsRepository.save({
@@ -117,23 +122,8 @@ export class ChannelsService {
             .getMany();
     }
 
-    async getChannelUnreadsCount(url: string, name: string, after: number) {
-        const channel = await this.channelsRepository
-            .createQueryBuilder('channel')
-            .innerJoin('channel.Workspace', 'workspace', 'workspace.url = url', { url })
-            .where('channel.name = :name', { name })
-            .getOne();
-
-        return this.channelchatsRepository.count({ // COUNT(*)
-            where: {
-                ChannelId: channel.id,
-                createdAt: MoreThan(new Date(after)) // > createdAt > "확인한 현재시간"
-            }
-        })
-    }
-
     // tracsaction 관리 필요
-    async postWorkspaceChannelChats({url, name, content, myId}) { // 매개변수 객체처리하면  순서 상관 없어짐. 꿀팁
+    async createWorkspaceChannelChats({url, name, content, myId}) { // 매개변수 객체처리하면  순서 상관 없어짐. 꿀팁
         const channel = await this.channelsRepository
             .createQueryBuilder('channel')
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
@@ -193,5 +183,20 @@ export class ChannelsService {
                 .to(`/ws-${url}-${chatWithUser.ChannelId}`) // 2. 불러온 채팅정보로 해당 워크스페이스와 채널을 찾고
                 .emit('message', chatWithUser) // 3. 메시지로 전송
         }   
+    }
+
+    async getChannelUnreadsCount(url: string, name: string, after: number) {
+        const channel = await this.channelsRepository
+            .createQueryBuilder('channel')
+            .innerJoin('channel.Workspace', 'workspace', 'workspace.url = url', { url })
+            .where('channel.name = :name', { name })
+            .getOne();
+
+        return this.channelchatsRepository.count({ // COUNT(*)
+            where: {
+                ChannelId: channel.id,
+                createdAt: MoreThan(new Date(after)) // > createdAt > "확인한 현재시간"
+            }
+        })
     }
 }
