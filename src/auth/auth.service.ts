@@ -9,7 +9,8 @@ export class AuthService {
   constructor(
     // 공식문서처럼 usersService에서 로직을 추가로 만들어 가져오지 않고 InjectionRepository를 사용
     // 서비스에서 서비스를 부르면 모킹을 반복해야 하는 등 테스트 로직이 복잡해짐.
-    @InjectRepository(Users) private usersRepository: Repository<Users>,
+    @InjectRepository(Users) 
+    private usersRepository: Repository<Users>,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -17,7 +18,7 @@ export class AuthService {
         where: { email },
         select: ['id', 'password', 'email', 'nickname'] // User entity에서 password를 select: false로 막아놨기 때문에 설정해줘야함.
     });
-    console.log(email, password, user)
+    console.log('validateUser(auth.service):::', email, password, user)
 
     if (!user) {
       return null;

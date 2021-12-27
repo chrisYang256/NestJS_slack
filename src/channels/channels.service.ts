@@ -24,9 +24,26 @@ export class ChannelsService {
         private readonly eventsGateway: EventsGateway,
     ) {}
 
-    async findChannelById(Id: number) {
-        // return this.channelsRepository.findOne({ where: { id} });
-        return this.channelsRepository.createQueryBuilder('channels').where('id').getOne();
+    async findChannelById(url: string, id: number) {
+        const channel = await this.channelsRepository
+            .createQueryBuilder('channels')
+            .innerJoin(
+                'channels.Workspace', 
+                'workspace', 
+                'workspace.url = :url', 
+                { url })
+            .where(
+                'channels.id = :id', 
+                { id }
+            )
+            .getOne();
+        console.log('channel:::', channel)
+        
+        if (!channel) {
+            throw new NotFoundException('존재하지 않는 채널입니다.')
+        }
+
+        return channel;
     }
     
     async getWorkspaceChannels(url: string, myId: number) {

@@ -7,7 +7,8 @@ import { Repository } from "typeorm";
 @Injectable()
 export class LocalSerializer extends PassportSerializer {
     constructor(
-        @InjectRepository(Users) private userRepository: Repository<Users>,
+        @InjectRepository(Users) 
+        private userRepository: Repository<Users>,
     ) {
         super();
     }
