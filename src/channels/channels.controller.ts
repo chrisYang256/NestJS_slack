@@ -28,13 +28,19 @@ export class ChannelsController {
         private channelsService: ChannelsService
     ) {}
 
+    @ApiOperation({ summary: '특정 워크스페이스 내 채널 아이디로 가져오기' })
+    @Get(':url/channels/:id')
+    findChannelById(@Param('url') url: string, @Param('id') id: number) {
+        return this.channelsService.findChannelById(url, id)
+    }
+
     @ApiOperation({ summary: '특정 워크스페이스 내 채널 모두 가져오기' })
     @Get(':url/channels')
-    getWorkspaceChannels(@Param('url') url: string, @GetUser() user: Users) {
+    async getWorkspaceChannels(@Param('url') url: string, @GetUser() user: Users) {
         return this.channelsService.getWorkspaceChannels(url, user.id)
     }
 
-    @ApiOperation({ summary: '특정 워크스페이스 내 특정 채널 가져오기' })
+    @ApiOperation({ summary: '특정 워크스페이스 내 특정 채널 이름으로 가져오기' })
     @Get(':url/channels/:name')
     async getWorkspaceChannel(@Param('url') url: string, @Param('name') name: string) {
         return this.channelsService.getWorkspaceChannel(url, name)
