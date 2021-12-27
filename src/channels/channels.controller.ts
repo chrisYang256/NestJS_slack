@@ -15,7 +15,7 @@ import { CreateChannelMemeberDto } from './dto/create-channel.member.dto';
 try { // 파일 업로드를 위한 저장소 설정
     fs.readdirSync('file-uploads');
 } catch (error) {
-    console.error('::: create file-uploads folder!');
+    console.error('::: Auto create file-uploads folder!');
     fs.mkdirSync('file-uploads');
 }
 
