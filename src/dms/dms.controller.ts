@@ -4,7 +4,7 @@ import { ApiCookieAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestj
 import * as fs from 'fs';
 import multer from 'multer';
 import path from 'path';
-import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { Users } from 'src/entities/Users';
 import { DmsService } from './dms.service';
@@ -18,7 +18,7 @@ try {
 
 @ApiTags('DMS')
 @ApiCookieAuth('connect.sid')
-@UseGuards(LocalAuthGuard)
+@UseGuards(LoggedInGuard)
 @Controller('api/workspaces')
 export class DmsController {
     constructor(
@@ -64,7 +64,7 @@ export class DmsController {
     @UseInterceptors(
         FilesInterceptor('image', 10, {
             storage: multer.diskStorage({
-                destination:(req, file, cb) {
+                destination:(req, file, cb) => {
                     cb(null, 'file-uploads/');
                 },
                 filename(req, file, cb) {
@@ -78,10 +78,21 @@ export class DmsController {
     @Post(':url/dms/:counterpartId/images')
     createWorkspaceDMImages(
         @Param('url') url: string,
-        @Param('counterpartId') counterpartId: number,
+        @Param('counterpartId', ParseIntPipe) counterpartId: number,
         @UploadedFiles() files: Express.Multer.File[],
         @GetUser() user: Users,
     ) {
         return this.dmsService.createWorkspaceDMImages(url, files, counterpartId, user.id);
+    }
+
+    @ApiOperation({ summary: '안읽은 DM counting' })
+    @Get(':url/dms/:counterpartId/unreads')
+    getUnleads(
+        @Param('url') url: string,
+        @Param('counterpartId') counterpartId: number,
+        @Query('after', ParseIntPipe) after: number,
+        @GetUser() user: Users
+    ) {
+        return this.dmsService.getUnleads(url, counterpartId, after, user.id);
     }
 }

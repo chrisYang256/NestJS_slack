@@ -46,8 +46,8 @@ export class DmsService {
             .innerJoin('dms.Workspace', 'workspace')
             .where('workspace.url = :url', { url })
             .andWhere(
-                `((dms.SenderId = :myId AND dms.ReceiverId = :counterpartId 
-                    OR (dms.ReceiverId = :myId AND dms.SenderId = :counterpartId)))`,
+                `((dms.SenderId = :myId AND dms.ReceiverId = :counterpartId)
+                    OR (dms.ReceiverId = :myId AND dms.SenderId = :counterpartId))`,
                 { counterpartId, myId }
             )
             .orderBy('dms.createdAt', 'DESC')
@@ -101,11 +101,49 @@ export class DmsService {
                 where: { id: dm.id },
                 relations: ['Sender']
             });
-            onlineMap[`/ws-${workspace.url}`],
-            Number(counterpartId),
-          );
-          this.eventsGateway.server.to(receiverSocketId).emit('dm', dmWithSender);
+            const receiverSocketId = getKeyByValue(
+                onlineMap[`/ws-${workspace.url}`],
+                Number(counterpartId),
+            );
+            this.eventsGateway.server.to(receiverSocketId).emit('dm', dmWithSender);
         }
 
+    }
+
+    // 기존 엔티티 매니저 코드
+    // async getDMUnreadsCount(url, id, myId, after) {
+    //     const workspace = await this.workspacesRepository.findOne({
+    //       where: { url },
+    //     });
+    //     return this.dmsRepository.count({
+    //       where: {
+    //         WorkspaceId: workspace.id,
+    //         SenderId: id,
+    //         ReceiverId: myId,
+    //         createdAt: MoreThan(new Date(after)),
+    //       },
+    //     });
+    //   }
+    // }
+    async getUnleads(url: string, counterpartId: number, after: number, myId: number) {
+        const nowDate = new Date(after);
+
+        return await this.dmsRepository
+            .createQueryBuilder('dms')
+            .innerJoinAndSelect('dms.SenderId', 'sender')
+            .innerJoinAndSelect('dms.ReceiverId', 'receiver')
+            .innerJoin('dms.Workspace', 'workspace')
+            .where('workspace.url = :url', { url })
+            .andWhere(
+                `(
+                    (sender.id = :myId) AND 
+                    (receiver.id = :counterpartId) AND
+                    (createdAt > :nowDate)
+                )`, 
+                { myId, counterpartId, nowDate }
+            )
+            // .getCount(); // 아래꺼 대신
+            .select('COUNT(dms.id)')
+            .getRawMany();
     }
 }

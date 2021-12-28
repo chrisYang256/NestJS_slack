@@ -7,6 +7,7 @@ import { Workspaces } from 'src/entities/Workspaces';
 import { ChannelMembers } from 'src/entities/ChannelMembers';
 import { Channels } from 'src/entities/Channels';
 import { Users } from 'src/entities/Users';
+import { DMs } from 'src/entities/DMs';
 
 @Module({
   providers: [WorkspacesService],
