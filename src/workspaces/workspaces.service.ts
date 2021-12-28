@@ -14,8 +14,6 @@ export class WorkspacesService {
         private WorkspacesRepository: Repository<Workspaces>,
         @InjectRepository(WorkspaceMembers)
         private workspaceMembersRepository: Repository<WorkspaceMembers>,
-        @InjectRepository(Channels)
-        private channelsRepository: Repository<Channels>,
         @InjectRepository(ChannelMembers)
         private channelMembersRepository: Repository<ChannelMembers>,
         @InjectRepository(Users)
@@ -23,8 +21,11 @@ export class WorkspacesService {
         private connection: Connection
     ) {}
 
-    async findMyWorkspaces(workspaceName: string) {
-        return this.WorkspacesRepository.find({ where: { name: [{ workspaceName }] }})
+    async findWorkspaces(workspaceName: string) {
+        return this.WorkspacesRepository
+            .createQueryBuilder('workspace')
+            .where('workspace.name = :workspaceName', { workspaceName })
+            .getMany();
     }
     
     async getMyWorkspaces(myId: number) {
@@ -75,19 +76,12 @@ export class WorkspacesService {
         }
     }
 
-    async getWrokspaceMembers(url: string) {
-        return this.usersRepository
-            .createQueryBuilder('user')
-            .innerJoin('user.WorkspaceMembers', 'wsMembers')
-            .innerJoin('wsMembers.Workspace', 'workspace', 'workspace.url = :url', { url })
-            .getMany();
-    }   
-
     async getWrokspaceMember(url: string, id: number) {
         return this.usersRepository
             .createQueryBuilder('user')
             .where('user.id = :id', { id }) // sql함수가 없는 이런 간단한 경우는 .where( { id } ) 라고만 넣어도 되긴 함
-            .innerJoin('user.Workspaces', 'workspaces', 'workspaces.url = :url', { url }).getOne();
+            .innerJoin('user.Workspaces', 'workspaces', 'workspaces.url = :url', { url })
+            .getOne();
     }
 
     // Query Builder 써보기
@@ -116,7 +110,7 @@ export class WorkspacesService {
     }
 
     // transaction 처리 전 상태
-    async createWorkspaceMembers(url: string, email: string) { // 초대
+    async inviteMemberToWorkspace(url: string, email: string) { // 초대
         // this.workspacesRepository.createQueryBuilder('w').innerJoinAndSelect('w.Channels', 'c').getOne();
         // typeorm은 join을 했다고 join한 테이블의 데이터를 가져오지 않기 때문에 joinAndSelec()를 써야함
         const workspace = await this.WorkspacesRepository.findOne({
@@ -146,4 +140,6 @@ export class WorkspacesService {
         await this.channelMembersRepository.save(channelMember);
 
     }
+
+    
 }

@@ -4,7 +4,7 @@ import { ApiCookieAuth, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestj
 import * as fs from 'fs';
 import multer from 'multer';
 import path from 'path';
-import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { Users } from 'src/entities/Users';
 import { DmsService } from './dms.service';
@@ -18,7 +18,7 @@ try {
 
 @ApiTags('DMS')
 @ApiCookieAuth('connect.sid')
-@UseGuards(LocalAuthGuard)
+@UseGuards(LoggedInGuard)
 @Controller('api/workspaces')
 export class DmsController {
     constructor(
