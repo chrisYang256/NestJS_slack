@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { userInfo } from 'os';
 import { ChannelMembers } from 'src/entities/ChannelMembers';
 import { Channels } from 'src/entities/Channels';
 import { Users } from 'src/entities/Users';
@@ -23,10 +22,10 @@ export class WorkspacesService {
         private usersRepository: Repository<Users>,
         private connection: Connection
     ) {}
-    
-    // async findById(id: number) {
-    //     return this.workspaceMembersRepository.findByIds( [id] );
-    // }
+
+    async findMyWorkspaces(workspaceName: string) {
+        return this.WorkspacesRepository.find({ where: { name: [{ workspaceName }] }})
+    }
     
     async getMyWorkspaces(myId: number) {
         return this.WorkspacesRepository.find({
@@ -34,21 +33,21 @@ export class WorkspacesService {
         });
     }
 
-    async createWorkspace(userId: number, name: string, url: string) {
+    async createWorkspace(myId: number, name: string, url: string) {
         const queryRunner = this.connection.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
             const workspace = new Workspaces(); // 다양한 방법의 typeorm 맵핑 
-            workspace.OwnerId = userId;
+            workspace.OwnerId = myId;
             workspace.name = name;
             workspace.url = url;
             // await this.WorkspacesRepository.save(workspace);
             await queryRunner.manager.getRepository(Workspaces).save(workspace)
     
             const workspaceMember = new WorkspaceMembers()
-            workspaceMember.UserId = userId;
+            workspaceMember.UserId = myId;
             workspaceMember.WorkspaceId = workspace.id;
     
             const channel = new Channels();
@@ -76,7 +75,15 @@ export class WorkspacesService {
         }
     }
 
-    async getWorkspaceMember(url: string, id: number) {
+    async getWrokspaceMembers(url: string) {
+        return this.usersRepository
+            .createQueryBuilder('user')
+            .innerJoin('user.WorkspaceMembers', 'wsMembers')
+            .innerJoin('wsMembers.Workspace', 'workspace', 'workspace.url = :url', { url })
+            .getMany();
+    }   
+
+    async getWrokspaceMember(url: string, id: number) {
         return this.usersRepository
             .createQueryBuilder('user')
             .where('user.id = :id', { id }) // sql함수가 없는 이런 간단한 경우는 .where( { id } ) 라고만 넣어도 되긴 함
@@ -85,7 +92,7 @@ export class WorkspacesService {
 
     // Query Builder 써보기
     // 해당 url을 가진 workspace 안의 사용자 가져오기(~~ 안의, ~~의: Join). workspaceMembers 안의 ~ -> innnerJoin
-    async getAllMemberListFromWrokspace(url: string) {
+    async getWrokspaceAllMembers(url: string) {
         this.usersRepository
             .createQueryBuilder('u') // 'u'는 uersRepository의 별명, 즉 Users Entity에 대한 별명
             .innerJoin('u.WorkspaceMembers', 'm') // 'm'은 u.workspaceMembers에 대한 별명(.workspaceMembers는 내가 Entity에 정의한 값)
