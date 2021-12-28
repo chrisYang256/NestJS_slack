@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { Users } from 'src/entities/Users';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
@@ -8,7 +8,7 @@ import { WorkspacesService } from './workspaces.service';
 
 @ApiTags('WORKSPACE')
 @ApiCookieAuth('connect.sid')
-@UseGuards(LocalAuthGuard)
+@UseGuards(LoggedInGuard)
 @Controller('api/workspaces')
 export class WorkspacesController {
     constructor(

@@ -11,7 +11,7 @@ import { Connection, Repository } from 'typeorm';
 export class WorkspacesService {
     constructor(
         @InjectRepository(Workspaces)
-        private WorkspacesRepository: Repository<Workspaces>,
+        private workspacesRepository: Repository<Workspaces>,
         @InjectRepository(WorkspaceMembers)
         private workspaceMembersRepository: Repository<WorkspaceMembers>,
         @InjectRepository(ChannelMembers)
@@ -22,16 +22,21 @@ export class WorkspacesService {
     ) {}
 
     async findWorkspaces(workspaceName: string) {
-        return this.WorkspacesRepository
+        return this.workspacesRepository
             .createQueryBuilder('workspace')
             .where('workspace.name = :workspaceName', { workspaceName })
             .getMany();
     }
     
     async getMyWorkspaces(myId: number) {
-        return this.WorkspacesRepository.find({
-            where: { WorkspaceMembers: [{ UserId: myId }] }
-        });
+        return this.workspacesRepository
+            .createQueryBuilder('workspace')
+            .innerJoinAndSelect('workspace.WorkspaceMembers', 'WM')
+            .where('WM.UserId = :myId', { myId })
+            .getMany();
+        // return this.workspacesRepository.find({
+        //     where: { WorkspaceMembers: [{ userId: myId }] }
+        // });
     }
 
     async createWorkspace(myId: number, name: string, url: string) {
@@ -113,7 +118,7 @@ export class WorkspacesService {
     async inviteMemberToWorkspace(url: string, email: string) { // 초대
         // this.workspacesRepository.createQueryBuilder('w').innerJoinAndSelect('w.Channels', 'c').getOne();
         // typeorm은 join을 했다고 join한 테이블의 데이터를 가져오지 않기 때문에 joinAndSelec()를 써야함
-        const workspace = await this.WorkspacesRepository.findOne({
+        const workspace = await this.workspacesRepository.findOne({
             where: { url },
             // relations: ['Channels'] 대신 join 사용해보기
             join: {
