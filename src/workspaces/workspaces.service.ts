@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChannelMembers } from 'src/entities/ChannelMembers';
 import { Channels } from 'src/entities/Channels';
@@ -22,19 +22,22 @@ export class WorkspacesService {
     ) {}
 
     async findWorkspaces(workspaceName: string) {
-        return this.workspacesRepository
+        const workspaces = await this.workspacesRepository
             .createQueryBuilder('workspace')
-            .where('workspace.name = :workspaceName', { workspaceName })
+            .where('workspace.name like :name', { name: `%${workspaceName}%` })
             .getMany();
+
+        console.log('findWorkspaces:::', workspaces)
+        return workspaces;
     }
     
     async getMyWorkspaces(myId: number) {
-        return this.workspacesRepository
+        return await this.workspacesRepository
             .createQueryBuilder('workspace')
-            .innerJoinAndSelect('workspace.WorkspaceMembers', 'WM')
+            .innerJoin('workspace.WorkspaceMembers', 'WM')
             .where('WM.UserId = :myId', { myId })
             .getMany();
-        // return this.workspacesRepository.find({
+        // return this.workspacesRepository.find({ // 안되는 로직
         //     where: { WorkspaceMembers: [{ userId: myId }] }
         // });
     }
@@ -42,6 +45,15 @@ export class WorkspacesService {
     async createWorkspace(myId: number, name: string, url: string) {
         const queryRunner = this.connection.createQueryRunner();
         await queryRunner.connect();
+
+        const checkName = await this.workspacesRepository
+            .createQueryBuilder('workspace')
+            .where('workspace.name = :name', { name })
+
+        if (checkName) {
+            throw new ForbiddenException('이미 존재하는 채널 url입니다');
+        }
+
         await queryRunner.startTransaction();
 
         try {
@@ -68,10 +80,11 @@ export class WorkspacesService {
             ]); 
     
             const channelMember = new ChannelMembers();
-            channelMember.UserId = channelResults.id;
+            channelMember.UserId = myId;
             channelMember.ChannelId = channelResults.id;
-            queryRunner.manager.getRepository(ChannelMembers).save(channelMember);
+            await queryRunner.manager.getRepository(ChannelMembers).save(channelMember);
             // await this.channelMembersRepository.save(channelMember);
+            await queryRunner.commitTransaction();
         } catch(error) {
             console.error(error);
             await queryRunner.rollbackTransaction();
@@ -92,7 +105,7 @@ export class WorkspacesService {
     // Query Builder 써보기
     // 해당 url을 가진 workspace 안의 사용자 가져오기(~~ 안의, ~~의: Join). workspaceMembers 안의 ~ -> innnerJoin
     async getWrokspaceAllMembers(url: string) {
-        this.usersRepository
+        return await this.usersRepository
             .createQueryBuilder('u') // 'u'는 uersRepository의 별명, 즉 Users Entity에 대한 별명
             .innerJoin('u.WorkspaceMembers', 'm') // 'm'은 u.workspaceMembers에 대한 별명(.workspaceMembers는 내가 Entity에 정의한 값)
             // !!원래 다대다 관계를 설정해두면 .innerJoin('u.Workspaces', 'w', 'w.url = :url, { url })만 써도 되지만 typeOrm버그가 있어서 두번 Join함.
@@ -115,7 +128,7 @@ export class WorkspacesService {
     }
 
     // transaction 처리 전 상태
-    async inviteMemberToWorkspace(url: string, email: string) { // 초대
+    async inviteMemberToWorkspaceChannel(url: string, email: string) { // 초대
         // this.workspacesRepository.createQueryBuilder('w').innerJoinAndSelect('w.Channels', 'c').getOne();
         // typeorm은 join을 했다고 join한 테이블의 데이터를 가져오지 않기 때문에 joinAndSelec()를 써야함
         const workspace = await this.workspacesRepository.findOne({
@@ -128,10 +141,21 @@ export class WorkspacesService {
                 },
             },
         });
+        console.log('workspace:::', workspace);
 
         const user = await this.usersRepository.findOne({ where: { email } });
         if (!user) {
-            return null;
+            throw new ForbiddenException('존재하지 않는 사용자입니다.');
+        }
+        console.log('user:::', user);
+
+        const JoinedChannelMember = await this.channelMembersRepository
+            .createQueryBuilder('CM')
+            .where('CM.UserId = :user', { user: user.id })
+            .getOne();
+
+        if (JoinedChannelMember) {
+            throw new ForbiddenException('채널에 가입된 회원입니다.');
         }
 
         const workspaceMember = new WorkspaceMembers(); // 1. 워크스페이스 초대
@@ -143,8 +167,5 @@ export class WorkspacesService {
         channelMember.UserId = user.id;
         channelMember.ChannelId = workspace.Channels.find((v) => v.name === '일반').id;
         await this.channelMembersRepository.save(channelMember);
-
     }
-
-    
 }

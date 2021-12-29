@@ -35,13 +35,13 @@ export class WorkspacesController {
         return this.workspacesService.createWorkspace(user.id, body.name, body.url)
     }
 
-    @ApiOperation( { summary: '워크스페이스 특정 맴버 가져오기 '})
+    @ApiOperation( { summary: '워크스페이스 특정 맴버 가져오기'})
     @Get(':url/users/:id')
     getWrokspaceMember(@Param('url') url: string, @Param('id') id: number, ) {
         return this.workspacesService.getWrokspaceMember(url, id);
     }
 
-    @ApiOperation( { summary: '워크스페이스 맴버 모두 가져오기 '})
+    @ApiOperation( { summary: '워크스페이스 맴버 모두 가져오기'})
     @Get(':url/members')
     getWrokspaceAllMembers(@Param('url') url: string) {
         return this.workspacesService.getWrokspaceAllMembers(url);
@@ -49,7 +49,7 @@ export class WorkspacesController {
 
     @ApiOperation({ summary: '워크스페이스 맴버 초대하기' })
     @Post(':url/members')
-    inviteMemberToWorkspace(@Param('url') url: string, @Body('email') email: string) {
-        return this.workspacesService.inviteMemberToWorkspace(url, email)
+    inviteMemberToWorkspaceChannel(@Param('url') url: string, @Body('email') email: string) {
+        return this.workspacesService.inviteMemberToWorkspaceChannel(url, email)
     }
 }
