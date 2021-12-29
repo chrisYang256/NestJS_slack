@@ -35,7 +35,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     });
   }
 
-  afterInit(server: any): any {
+  afterInit(server: Server): any {
     console.log(':::websocketserver init')
   }
 

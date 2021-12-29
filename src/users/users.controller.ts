@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
 import { NotLoggedInGuard } from 'src/auth/not-logged-in.guard copy';
@@ -8,6 +8,7 @@ import { UndefindToNullInterceptor } from 'src/common/interceptors/undefinedToNu
 import { JoinRequestDto } from './dto/join.request.dto';
 import { UserWithIdDto } from './dto/user.response.dto';
 import { UsersService } from './users.service';
+import { Users } from 'src/entities/Users';
 
 @UseInterceptors(UndefindToNullInterceptor) // 개별 라우터에 붙이면 각각 적용됨.
 @ApiTags('USER')
@@ -20,6 +21,7 @@ export class UsersController {
     @ApiOkResponse({ description: 'response 성공', type: UserWithIdDto })
     @ApiOperation({ summary: '내 정보 조회' }) // swagger decorator
     @Get()
+    @ApiCookieAuth('connect.sid')
     getUsers(@GetUser() user) {
         return user || false; // login 안했는데 조회하면 false
     }
@@ -34,18 +36,18 @@ export class UsersController {
 
     @ApiOkResponse({ description: 'response 성공', type: UserWithIdDto })
     @ApiOperation({ summary: '로그인' })
-    @Post('/logIn')
+    @Post('/login')
     @UseGuards(LocalAuthGuard)
-    logIn(@GetUser() user ) {
+    logIn(@GetUser() user: Users ) {
         return user;
     }
 
     @ApiOperation({ summary: '로그아웃'})
-    @Post('/logOut')
+    @Post('/logout')
     @UseGuards(LoggedInGuard)
     logOut(@Req() req, @Res() res) {
-        req.logOut();
+        // req.logOut();
         res.clearCookie('connect.sid', { httpOnly: true });
-        res.send('ok');
+        return res.send('ok');
     }
 }
