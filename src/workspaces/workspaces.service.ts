@@ -129,33 +129,40 @@ export class WorkspacesService {
 
     // transaction 처리 전 상태
     async inviteMemberToWorkspaceChannel(url: string, email: string) { // 초대
-        // this.workspacesRepository.createQueryBuilder('w').innerJoinAndSelect('w.Channels', 'c').getOne();
         // typeorm은 join을 했다고 join한 테이블의 데이터를 가져오지 않기 때문에 joinAndSelec()를 써야함
-        const workspace = await this.workspacesRepository.findOne({
-            where: { url },
-            // relations: ['Channels'] 대신 join 사용해보기
-            join: {
-                alias: 'w', // alias: 'workspace'
-                innerJoinAndSelect: {
-                    c: 'w.Channels', // channels: 'w.channels'
-                },
-            },
-        });
+        // const workspace = await this.workspacesRepository.findOne({
+        //     where: { url },
+        //     // relations: ['Channels'] 대신 join 사용해보기
+        //     join: {
+        //         alias: 'w', // alias: 'workspace'
+        //         innerJoinAndSelect: {
+        //             c: 'w.Channels', // channels: 'w.channels'
+        //         },
+        //     },
+        // });
+        
+        const workspace = await this.workspacesRepository
+            .createQueryBuilder('workspace')
+            .innerJoinAndSelect('workspace.Channels', 'C')
+            .where('workspace.url = :url', { url })
+            .getOne();
+        
         console.log('workspace:::', workspace);
 
-        const user = await this.usersRepository.findOne({ where: { email } });
+        // 유저 정보에 workspace를 조인하여 담아놓음으로 두가지의 validation을 할 수 있도록 함.
+        const user = await this.usersRepository
+            .createQueryBuilder('u')
+            .where('u.email = :email', { email })
+            .innerJoinAndSelect('u.Workspaces', 'w')
+            .getOne();
+        console.log('user:::', user);
+
         if (!user) {
             throw new ForbiddenException('존재하지 않는 사용자입니다.');
         }
-        console.log('user:::', user);
 
-        const JoinedChannelMember = await this.channelMembersRepository
-            .createQueryBuilder('CM')
-            .where('CM.UserId = :user', { user: user.id })
-            .getOne();
-
-        if (JoinedChannelMember) {
-            throw new ForbiddenException('채널에 가입된 회원입니다.');
+        if (user.Workspaces.find((v) => v.url === url)) {
+            throw new ForbiddenException(`이미 '${workspace.name}' 워크스페이스에 초대된 회원입니다.`);
         }
 
         const workspaceMember = new WorkspaceMembers(); // 1. 워크스페이스 초대
@@ -163,9 +170,10 @@ export class WorkspacesService {
         workspaceMember.UserId = user.id;
         await this.workspaceMembersRepository.save(workspaceMember);
 
-        const channelMember = new ChannelMembers(); // 2. 채널 초대
-        channelMember.UserId = user.id;
-        channelMember.ChannelId = workspace.Channels.find((v) => v.name === '일반').id;
-        await this.channelMembersRepository.save(channelMember);
+        // 채널까지 한번에 초대시키려면 아래 로직 사용. 그러나 실재 slack과도 다르고 channels 모듈에 거의 같은 기능이 있어서 주석처리.
+        // const channelMember = new ChannelMembers(); // 2. 채널 초대
+        // channelMember.UserId = user.id;
+        // channelMember.ChannelId = workspace.Channels.find((v) => v.name === '일반').id;
+        // await this.channelMembersRepository.save(channelMember);
     }
 }

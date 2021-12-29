@@ -28,7 +28,7 @@ export class UsersController {
 
     @ApiOkResponse({ description: 'response 성공', type: JoinRequestDto })
     @ApiOperation({ summary: '회원가입' })
-    @Post('/signin')
+    @Post('/signup')
     @UseGuards(NotLoggedInGuard)
     async signUp(@Body() data: JoinRequestDto) { // data가 아니라 body로 해도 되고 자유.
         await this.usersService.signUp(data.email, data.nickname, data.password);
