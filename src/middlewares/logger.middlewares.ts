@@ -19,10 +19,11 @@ export class LoggerMiddleware implements NestMiddleware {
             const { statusCode } = response;
             const contentLength = response.get('content-length');
 
-            this.logger.log(`${method} ${originalUrl} ${statusCode} ${contentLength} - ${userAgent} ${ip}`);
+            this.logger.log(`'M':${method} 'OU':${originalUrl} 'SC':${statusCode} 'CL':${contentLength} - 'UA':${userAgent} 'IP':${ip}`);
         });
 
         // 2. 라우터로 감.
         next();
     }
 }
+// [Nest] 50612  - 2021. 12. 30. 오후 7:17:38     LOG [HTTP] 'M':POST 'OU':/api/users/login 'SC':201 'CL':67 - 'UA':PostmanRuntime/7.28.4 'IP':::1

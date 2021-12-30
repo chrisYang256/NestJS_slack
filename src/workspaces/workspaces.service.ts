@@ -140,7 +140,7 @@ export class WorkspacesService {
         //         },
         //     },
         // });
-        
+        // 쿼리빌더 연습을 위한 리팩토링
         const workspace = await this.workspacesRepository
             .createQueryBuilder('workspace')
             .innerJoinAndSelect('workspace.Channels', 'C')
@@ -152,8 +152,8 @@ export class WorkspacesService {
         // 유저 정보에 workspace를 조인하여 담아놓음으로 두가지의 validation을 할 수 있도록 함.
         const user = await this.usersRepository
             .createQueryBuilder('u')
-            .where('u.email = :email', { email })
             .innerJoinAndSelect('u.Workspaces', 'w')
+            .where('u.email = :email', { email })
             .getOne();
         console.log('user:::', user);
 

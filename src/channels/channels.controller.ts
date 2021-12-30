@@ -28,22 +28,23 @@ export class ChannelsController {
         private channelsService: ChannelsService
     ) {}
 
-    @ApiOperation({ summary: '특정 워크스페이스 내 채널 아이디로 가져오기' })
-    @Get(':url/channels/:id')
+    @ApiOperation({ summary: '특정 워크스페이스의 특정 채널을 아이디로 가져오기' })
+    @Get(':url/channel/:id')
     findChannelById(@Param('url') url: string, @Param('id') id: number) {
-        return this.channelsService.findChannelById(url, id)
+        return this.channelsService.findChannelById(url, id);
     }
 
-    @ApiOperation({ summary: '특정 워크스페이스 내 채널 모두 가져오기' })
+    @ApiOperation({ summary: '특정 워크스페이스의 특정 채널을 이름으로 가져오기' })
+    @Get(':url/channels/:name')
+    async getWorkspaceChannelByName(@Param('url') url: string, @Param('name') name: string) {
+        console.log('name:::', name)
+        return this.channelsService.getWorkspaceChannelByName(url, name);
+    }
+
+    @ApiOperation({ summary: '특정 워크스페이스에 내가 속한 채널 모두 가져오기' })
     @Get(':url/channels')
     async getWorkspaceChannels(@Param('url') url: string, @GetUser() user: Users) {
-        return this.channelsService.getWorkspaceChannels(url, user.id)
-    }
-
-    @ApiOperation({ summary: '특정 워크스페이스 내 특정 채널 이름으로 가져오기' })
-    @Get(':url/channels/:name')
-    async getWorkspaceChannel(@Param('url') url: string, @Param('name') name: string) {
-        return this.channelsService.getWorkspaceChannel(url, name)
+        return this.channelsService.getWorkspaceChannels(url, user.id);
     }
 
     @ApiOperation({ summary: '워크스페이스에 채널 만들기' })
@@ -53,7 +54,7 @@ export class ChannelsController {
         @Body() body: CreateChannelDto,
         @GetUser() user: Users,
     ) {
-        return this.channelsService.createWorkspaceChannel(url, body.name, user.id)
+        return this.channelsService.createWorkspaceChannel(url, body.channelName, user.id);
     }
 
     @ApiOperation({ summary: '채널 맴버들 가져오기' })
@@ -119,7 +120,7 @@ export class ChannelsController {
         @GetUser() user: Users
     ) {
         console.log('multer-file:::', files)
-        return this.channelsService.createWorkspaceChannelImage(url, name, files, user.id)
+        return this.channelsService.createWorkspaceChannelImage(url, name, files, user.id);
     }
 
     @Get(':url/channels/:name/unreads') // 안읽은 메시지

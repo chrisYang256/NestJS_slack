@@ -45,12 +45,29 @@ export class ChannelsService {
 
         return channel;
     }
+
+    async getWorkspaceChannelByName(url: string, name: string) {
+        // return this.channelsRepository.findOne({
+        //     where: { name },
+        //     relations: ['Workspace'] // workspace까지 가져오기
+        // });
+        console.log('name:::', name);
+
+        const channelsByName = await this.channelsRepository
+            .createQueryBuilder('channel')
+            .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
+            .where('channel.channelName like :name', { name: `%${name}%` })
+            .getMany();
+
+        console.log('channelsByName:::', channelsByName);
+        return channelsByName;
+    }
     
     async getWorkspaceChannels(url: string, myId: number) {
         return this.channelsRepository
         .createQueryBuilder('channels') // alias by Channels entity
         .innerJoinAndSelect(
-            'channels.Channelmembers',
+            'channels.ChannelMembers',
             'channelMembers', // alias by ChannelMembers entity
             'channelMembers.userId = :myId',
             { myId }
@@ -64,24 +81,12 @@ export class ChannelsService {
         .getMany();
     }
 
-    async getWorkspaceChannel(url: string, name: string) {
-        // return this.channelsRepository.findOne({
-        //     where: { name },
-        //     relations: ['Workspace'] // workspace까지 가져오기
-        // });
-        return this.channelsRepository
-            .createQueryBuilder('channel')
-            .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
-            .where('channel.name = :name', { name })
-            .getOne();
-    }
-
     // transaction 관리 필요
     async createWorkspaceChannel(url: string, name: string, myId: number) {
         const workspace = await this.wrorkspaceRepository.findOne({ where: { url }});
 
         const channel = await this.channelsRepository.save({
-            name,
+            name: name,
             WrokspaceId: workspace.id
         });
         
@@ -94,7 +99,7 @@ export class ChannelsService {
     async getWorkspaceChannelMembers(url: string, name: string) {
         return this.usersRepository
             .createQueryBuilder('user')
-            .innerJoin('user.channels', 'channels', 'channels.name = :name', { name }) // 같은 채널 이름이 다른 워크스페이스에 있을 수 있으니
+            .innerJoin('user.channels', 'channels', 'channels.channelName = :name', { name }) // 같은 채널 이름이 다른 워크스페이스에 있을 수 있으니
             .innerJoin('channels.Workspace', 'workspace', 'workspace.url = :url', { url }) // workspace도 추가로 검색
             .getMany();
     }
@@ -104,7 +109,7 @@ export class ChannelsService {
         const channel = await this.channelsRepository
             .createQueryBuilder('channel')
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
-            .where('channel.name = :name', { name })
+            .where('channel.channelName = :name', { name })
             .getOne();
 
         if(!channel) {
@@ -130,7 +135,7 @@ export class ChannelsService {
     async getWorkspaceChannelChats(url: string, name: string, perPage: number, page: number) {
         return this.channelchatsRepository
             .createQueryBuilder('channelChats')
-            .innerJoin('channelChats.Channel', 'channel', 'channel.name = :name', { name }) // name, url은 자주 나오니 indexing해주자
+            .innerJoin('channelChats.Channel', 'channel', 'channel.channelName = :name', { name }) // name, url은 자주 나오니 indexing해주자
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
             .innerJoinAndSelect('channelChats.User', 'user')
             .orderBy('channelChats.createdAt', 'DESC')
@@ -144,7 +149,7 @@ export class ChannelsService {
         const channel = await this.channelsRepository
             .createQueryBuilder('channel')
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
-            . where('channel.name = :name', { name })
+            . where('channel.channelName = :name', { name })
             .getOne();
 
         if (!channel) {
@@ -176,7 +181,7 @@ export class ChannelsService {
         const channel = await this.channelsRepository
             .createQueryBuilder('channel')
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
-            .where('channel.name = :name', { name })
+            .where('channel.channelName = :name', { name })
             .getOne();
         
             if (!channel) {
@@ -206,7 +211,7 @@ export class ChannelsService {
         const channel = await this.channelsRepository
             .createQueryBuilder('channel')
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = url', { url })
-            .where('channel.name = :name', { name })
+            .where('channel.channelName = :name', { name })
             .getOne();
 
         return this.channelchatsRepository.count({ // COUNT(*)

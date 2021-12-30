@@ -18,10 +18,11 @@ export class UsersService {
         private connection: Connection // query runner transaction controll https://docs.nestjs.kr/techniques/database#transactions
     ) {}
 
+    // 이메일 validation을 여러 service에서 사용할 경우 사용. 여기서는 필요없음.
     async findByEmail(email: string) {
         return this.usersRepository.findOne({
             where: { email },
-            select: [ 'id', 'email', 'password']
+            select: [ 'id', 'email', 'password'] // users entity에서 password를 select: false로 막아서 따로 select해야함.
         });
     }
 
