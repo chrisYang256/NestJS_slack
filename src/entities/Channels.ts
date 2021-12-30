@@ -10,7 +10,7 @@ export class Channels {
     @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
     id: number;
 
-    @Column('varchar', { name: 'name', length: 30 })
+    @Column('varchar', { name: 'channelName', length: 30 })
     name: string;
 
     @Column('tinyint', { name: 'private', nullable: true, width: 1, default: () => "'0'"})

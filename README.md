@@ -35,27 +35,11 @@ $ npm install
 ## Running the app
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
 $ npm run start:dev
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
 ## Slack clone coding 강의 학습
+!! 학습을 위해 리팩토링을 하였기에 원본과 차이가 있습니다.
 
 ▶︎ 초기 세팅
 - 새 프로젝트 디렉토리 생성(@nestjs/cli -> nest new 프로젝트이름 or ./)
