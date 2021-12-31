@@ -7,9 +7,9 @@ import { Mentions } from "./Mentions";
 import { Users } from "./Users";
 import { WorkspaceMembers } from "./WorkspaceMembers";
 
-// @Index('name', ['name'], { unique: true })
-// @Index('url', ['url'], { unique: true })
-// @Index('OwnerId', ['OwnerId'], {})
+@Index('name', ['name'], { unique: true })
+@Index('url', ['url'], { unique: true })
+@Index('OwnerId', ['OwnerId'], {})
 @Entity({ schema: 'slack', name: 'workspaces' })
 export class Workspaces {
     @PrimaryGeneratedColumn({ type: 'int', name: 'id' })

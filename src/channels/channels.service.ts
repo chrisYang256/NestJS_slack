@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, Redirect } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChannelChats } from 'src/entities/CannelChats';
+import { ChannelChats } from 'src/entities/ChannelChats';
 import { ChannelMembers } from 'src/entities/ChannelMembers';
 import { Channels } from 'src/entities/Channels';
 import { Users } from 'src/entities/Users';
@@ -46,7 +46,7 @@ export class ChannelsService {
         return channel;
     }
 
-    async getWorkspaceChannelByName(url: string, name: string) {
+    async findWorkspaceChannelByName(url: string, name: string) {
         // return this.channelsRepository.findOne({
         //     where: { name },
         //     relations: ['Workspace'] // workspace까지 가져오기
@@ -56,7 +56,7 @@ export class ChannelsService {
         const channelsByName = await this.channelsRepository
             .createQueryBuilder('channel')
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
-            .where('channel.channelName like :name', { name: `%${name}%` })
+            .where('channel.name like :name', { name: `%${name}%` })
             .getMany();
 
         console.log('channelsByName:::', channelsByName);
@@ -84,10 +84,19 @@ export class ChannelsService {
     // transaction 관리 필요
     async createWorkspaceChannel(url: string, name: string, myId: number) {
         const workspace = await this.wrorkspaceRepository.findOne({ where: { url }});
+        const nameCheck = await this.channelsRepository.createQueryBuilder('c').where('c.name = :name', { name }).getOne();
+
+        if (!workspace) {
+            throw new BadRequestException('존재하지 않는 워크스페이스입니다.');
+        }
+
+        if (nameCheck) {
+            throw new ForbiddenException('같은 이름의 채널이 존재합니다.');
+        }
 
         const channel = await this.channelsRepository.save({
             name: name,
-            WrokspaceId: workspace.id
+            WorkspaceId: workspace.id
         });
         
         await this.channelmembersRepository.save({
@@ -99,8 +108,8 @@ export class ChannelsService {
     async getWorkspaceChannelMembers(url: string, name: string) {
         return this.usersRepository
             .createQueryBuilder('user')
-            .innerJoin('user.channels', 'channels', 'channels.channelName = :name', { name }) // 같은 채널 이름이 다른 워크스페이스에 있을 수 있으니
-            .innerJoin('channels.Workspace', 'workspace', 'workspace.url = :url', { url }) // workspace도 추가로 검색
+            .innerJoin('user.Workspaces', 'workspace', 'workspace.url = :url', { url }) // workspace도 추가로 검색
+            .innerJoin('user.Channels', 'channels', 'channels.name = :name', { name }) // 같은 채널 이름이 다른 워크스페이스에 있을 수 있으니
             .getMany();
     }
 
@@ -109,27 +118,39 @@ export class ChannelsService {
         const channel = await this.channelsRepository
             .createQueryBuilder('channel')
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
-            .where('channel.channelName = :name', { name })
+            .where('channel.name = :name', { name })
             .getOne();
 
         if(!channel) {
-            throw new NotFoundException('존재하지 않는 채널입니다.')
+            throw new NotFoundException('존재하지 않는 채널입니다.');
 
         }
+
         const user = await this.usersRepository
             .createQueryBuilder('user')
             .where('user.email = :email', { email })
             .innerJoin('user.Workspaces', 'workspace', 'workspace.url = :url', { url })
+            .innerJoinAndSelect('user.Channels', 'channels')
             .getOne();
         
         if (!user) {
-            throw new NotFoundException('존재하지 않는 사용자입니다.')
+            throw new NotFoundException('워크스페이스에 존재하지 않는 사용자입니다.')
         }
 
-        await this.channelmembersRepository.save({
-            ChannelId: channel.id,
-            UserId: user.id
-        });
+        if (user.Channels.find((v) => v.name === name)) {
+            throw new ForbiddenException(`이미 '${channel.name}' 채널에 초대된 회원입니다.`)
+        }
+
+        // await this.channelmembersRepository.save({
+        //     ChannelId: channel.id,
+        //     UserId: user.id
+        // });
+        await this.channelmembersRepository
+            .createQueryBuilder()
+            .insert()
+            .into('ChannelMembers')
+            .values({ChannelId: channel.id, UserId: user.id})
+            .execute();
     }
 
     async getWorkspaceChannelChats(url: string, name: string, perPage: number, page: number) {
@@ -149,7 +170,7 @@ export class ChannelsService {
         const channel = await this.channelsRepository
             .createQueryBuilder('channel')
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
-            . where('channel.channelName = :name', { name })
+            .where('channel.name = :name', { name })
             .getOne();
 
         if (!channel) {
@@ -161,14 +182,22 @@ export class ChannelsService {
             UserId: myId,
             ChannelId: channel.id
         });
+        // const chat = await this.channelchatsRepository
+        //     .createQueryBuilder()
+        //     .insert()
+        //     .into('ChannelChats')
+        //     .values({content, UserId: myId, ChannelId: channel.id})
+        //     .execute();
 
-        const chatWithUser = await this.channelchatsRepository.findOne({
-            where: { id: chat.id },
-            relations: ['User', 'Channel']
-        });
+        console.log('chat:::', chat.id)
+
+        // const chatWithUser = await this.channelchatsRepository.findOne({
+        //     where: { id: chat.id },
+        //     relations: ['User', 'Channel']
+        // });
 
         // socket.io로 해당 워크스페이스 채널 사용자들에게 전송
-        this.eventsGateway.server.to(`/ws-${url}-${channel.id}`).emit('message', chatWithUser);
+        // this.eventsGateway.server.to(`/ws-${url}-${channel.id}`).emit('message', chatWithUser);
     }
 
     // transaction 관리 필요
@@ -181,7 +210,7 @@ export class ChannelsService {
         const channel = await this.channelsRepository
             .createQueryBuilder('channel')
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = :url', { url })
-            .where('channel.channelName = :name', { name })
+            .where('channel.name = :name', { name })
             .getOne();
         
             if (!channel) {
@@ -211,7 +240,7 @@ export class ChannelsService {
         const channel = await this.channelsRepository
             .createQueryBuilder('channel')
             .innerJoin('channel.Workspace', 'workspace', 'workspace.url = url', { url })
-            .where('channel.channelName = :name', { name })
+            .where('channel.name = :name', { name })
             .getOne();
 
         return this.channelchatsRepository.count({ // COUNT(*)

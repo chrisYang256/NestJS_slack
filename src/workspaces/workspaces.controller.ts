@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
@@ -49,7 +49,7 @@ export class WorkspacesController {
 
     @ApiOperation({ summary: '워크스페이스 맴버 초대하기' })
     @Post(':url/members')
-    inviteMemberToWorkspaceChannel(@Param('url') url: string, @Body('email') email: string) {
-        return this.workspacesService.inviteMemberToWorkspaceChannel(url, email)
+    inviteMemberToWorkspace(@Param('url') url: string, @Body('email') email: string) {
+        return this.workspacesService.inviteMemberToWorkspace(url, email)
     }
 }

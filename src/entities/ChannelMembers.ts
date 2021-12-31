@@ -4,7 +4,7 @@ import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, UpdateD
 import { Channels } from "./Channels";
 import { Users } from "./Users";
 
-// @Index('UserId', ['UserId'], {})
+@Index('UserId', ['UserId'], {})
 @Entity({ schema: 'slack', name: 'channelmembers'})
 export class ChannelMembers {
     // @PrimaryGeneratedColumn({ type: 'int', name: 'id' })

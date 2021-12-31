@@ -1,0 +1,21 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: With Cookie Authentication
+  description: With Cookie Authentication
+
+securityDefinitions:
+  myCookie:
+    type: apiKey
+    name: Cookie
+    in: header
+paths: 
+  /say-hi:
+    get:
+      summary: Say Hello
+      description: Say Hello
+      responses:
+        200:
+          description: OK
+      security:
+        - myCookie: []

@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Redirect, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/common/decorator/get-user.decorator';
 import { ChannelsService } from './channels.service';
 import { PostChatDto } from './dto/post-chat.dto';
@@ -36,9 +36,8 @@ export class ChannelsController {
 
     @ApiOperation({ summary: '특정 워크스페이스의 특정 채널을 이름으로 가져오기' })
     @Get(':url/channels/:name')
-    async getWorkspaceChannelByName(@Param('url') url: string, @Param('name') name: string) {
-        console.log('name:::', name)
-        return this.channelsService.getWorkspaceChannelByName(url, name);
+    async findWorkspaceChannelByName(@Param('url') url: string, @Param('name') name: string) {
+        return this.channelsService.findWorkspaceChannelByName(url, name);
     }
 
     @ApiOperation({ summary: '특정 워크스페이스에 내가 속한 채널 모두 가져오기' })
@@ -48,13 +47,14 @@ export class ChannelsController {
     }
 
     @ApiOperation({ summary: '워크스페이스에 채널 만들기' })
+    @Redirect('api/workspaces/:url/channels', 403) // 리다이렉션 하는 방법
     @Post(':url/channels')
     async createWorkspaceChannel(
         @Param('url') url: string,
         @Body() body: CreateChannelDto,
         @GetUser() user: Users,
     ) {
-        return this.channelsService.createWorkspaceChannel(url, body.channelName, user.id);
+        return this.channelsService.createWorkspaceChannel(url, body.name, user.id);
     }
 
     @ApiOperation({ summary: '채널 맴버들 가져오기' })
@@ -112,7 +112,8 @@ export class ChannelsController {
             }),
             limits: { fileSize: 5 * 1024 * 1024 } // 5메가
         }),
-    ) 
+    )
+    @ApiConsumes('multipart/form-data') 
     async createWorkspaceChannelImage(
         @UploadedFiles() files: Array<Express.Multer.File>, // Express.Multer.File[],
         @Param('url') url: string,

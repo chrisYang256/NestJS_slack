@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { ChannelChats } from "./CannelChats";
+import { ChannelChats } from "./ChannelChats";
 import { ChannelMembers } from "./ChannelMembers";
 import { Channels } from "./Channels";
 import { DMs } from "./DMs";
@@ -9,7 +9,7 @@ import { Mentions } from "./Mentions";
 import { WorkspaceMembers } from "./WorkspaceMembers";
 import { Workspaces } from "./Workspaces";
 
-// @Index('email', ['email'], { unique: true })
+@Index('email', ['email'], { unique: true })
 @Entity({ schema: 'slack', name: 'users' })
 export class Users {
     @ApiProperty({ example: 13, description: '회원 아이디'})
@@ -59,7 +59,7 @@ export class Users {
     @OneToMany(() => Workspaces, (workspaces) => workspaces.Owner)
     OwnedWorkspaces: Workspaces[];
 
-    @OneToMany(() => ChannelChats, (channnelchants) => channnelchants.User)
+    @OneToMany(() => ChannelChats, (channnelchats) => channnelchats.User)
     ChannelChats: ChannelChats[];
 
     @OneToMany(() => ChannelMembers, (channelmembers) => channelmembers.User)

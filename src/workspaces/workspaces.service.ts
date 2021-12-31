@@ -128,7 +128,7 @@ export class WorkspacesService {
     }
 
     // transaction 처리 전 상태
-    async inviteMemberToWorkspaceChannel(url: string, email: string) { // 초대
+    async inviteMemberToWorkspace(url: string, email: string) { // 초대
         // typeorm은 join을 했다고 join한 테이블의 데이터를 가져오지 않기 때문에 joinAndSelec()를 써야함
         // const workspace = await this.workspacesRepository.findOne({
         //     where: { url },
@@ -168,6 +168,7 @@ export class WorkspacesService {
         const workspaceMember = new WorkspaceMembers(); // 1. 워크스페이스 초대
         workspaceMember.WorkspaceId = workspace.id;
         workspaceMember.UserId = user.id;
+        workspaceMember.loggedInAt = new Date();
         await this.workspaceMembersRepository.save(workspaceMember);
 
         // 채널까지 한번에 초대시키려면 아래 로직 사용. 그러나 실재 slack과도 다르고 channels 모듈에 거의 같은 기능이 있어서 주석처리.
