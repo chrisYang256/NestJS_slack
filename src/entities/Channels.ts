@@ -1,16 +1,16 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { ChannelChats } from "./CannelChats";
+import { ChannelChats } from "./ChannelChats";
 import { ChannelMembers } from "./ChannelMembers";
 import { Users } from "./Users";
 import { Workspaces } from "./Workspaces";
 
-// @Index('WorkspaceId', ['WorkspaceId'], {})
+@Index('WorkspaceId', ['WorkspaceId'], {})
 @Entity({ schema: 'slack', name: 'channels' })
 export class Channels {
     @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
     id: number;
 
-    @Column('varchar', { name: 'channelName', length: 30 })
+    @Column('varchar', { name: 'name', length: 30 })
     name: string;
 
     @Column('tinyint', { name: 'private', nullable: true, width: 1, default: () => "'0'"})

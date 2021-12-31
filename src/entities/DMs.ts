@@ -2,9 +2,9 @@ import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, Primary
 import { Users } from "./Users";
 import { Workspaces } from "./Workspaces";
 
-// @Index('WorkspaceId', ['WorkspaceId'], {})
-// @Index('Dms_senderId', ['SenderId'], {})
-// @Index('Dms_receiverId', ['ReceiverId'], {})
+@Index('WorkspaceId', ['WorkspaceId'], {})
+@Index('Dms_senderId', ['SenderId'], {})
+@Index('Dms_receiverId', ['ReceiverId'], {})
 @Entity({ schema: 'slack', name: 'dms' })
 export class DMs {
     @PrimaryGeneratedColumn({ type: 'int', name: 'id' })

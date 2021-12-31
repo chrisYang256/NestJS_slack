@@ -38,7 +38,7 @@ export class UsersController {
     @ApiOperation({ summary: '로그인' })
     @Post('/login')
     @UseGuards(LocalAuthGuard)
-    logIn(@GetUser() user: Users ) {
+    logIn(@GetUser() user: Users, @Body() data: JoinRequestDto) { // @Body()를 넣어줘야 swagger에서 body가 활성화됨
         return user;
     }
 

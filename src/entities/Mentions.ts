@@ -4,9 +4,9 @@ import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, Primary
 import { Users } from "./Users";
 import { Workspaces } from "./Workspaces";
 
-// @Index('WorkspaceId', ['WorkspaceId'], {})
-// @Index('SenderId', ['SenderId'], {})
-// @Index('ReceiverId', ['ReceiverId'], {})
+@Index('WorkspaceId', ['WorkspaceId'], {})
+@Index('SenderId', ['SenderId'], {})
+@Index('ReceiverId', ['ReceiverId'], {})
 @Entity({ schema: 'slack', name: 'mentions' })
 export class Mentions {
     @PrimaryGeneratedColumn({ type: 'int', name: 'id' })

@@ -12,7 +12,7 @@ export class UndefindToNullInterceptor implements NestInterceptor {
     ): Observable<any> | Promise<Observable<any>> {
         // 컨트롤러 가기 전에 실행되는 내용 작성(logging할 때 시간 재거나 하는 때 사용)
 
-        // return 다음에는 컨트롤러 실행 후에 실행되는 내용 작성
+        // return 다음에는 컨트롤러 실행 후(response 가기 전)에 실행되는 내용 작성
         // data가 undefined로 들어가서 무시되는 경우를 막아주는 로직.(JSON은 undefined를 모르기 때문에 null로 바꿔서 에러 방지)
         // error 처리도 가능하지만 Exception filter로 보통 처리함.
         return next.handle().pipe(map((data) => data === undefined ? null : data)); 
