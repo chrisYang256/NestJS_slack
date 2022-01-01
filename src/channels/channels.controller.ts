@@ -113,7 +113,7 @@ export class ChannelsController {
             limits: { fileSize: 5 * 1024 * 1024 } // 5메가
         }),
     )
-    @ApiConsumes('multipart/form-data') 
+    @ApiConsumes('multipart/form-data')
     async createWorkspaceChannelImage(
         @UploadedFiles() files: Array<Express.Multer.File>, // Express.Multer.File[],
         @Param('url') url: string,

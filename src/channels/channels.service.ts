@@ -177,27 +177,33 @@ export class ChannelsService {
             throw new NotFoundException('채널이 존재하지 않습니다.');
         }
 
-        const chat = await this.channelchatsRepository.save({
-            content,
-            UserId: myId,
-            ChannelId: channel.id
-        });
-        // const chat = await this.channelchatsRepository
-        //     .createQueryBuilder()
-        //     .insert()
-        //     .into('ChannelChats')
-        //     .values({content, UserId: myId, ChannelId: channel.id})
-        //     .execute();
-
-        console.log('chat:::', chat.id)
+        // const chat = await this.channelchatsRepository.save({
+        //     content,
+        //     UserId: myId,
+        //     ChannelId: channel.id
+        // });
+        const chat = await this.channelchatsRepository
+            .createQueryBuilder()
+            .insert()
+            .into('ChannelChats')
+            .values({content, UserId: myId, ChannelId: channel.id})
+            .execute();
+        console.log('chat:::', chat.identifiers[0].id);
 
         // const chatWithUser = await this.channelchatsRepository.findOne({
-        //     where: { id: chat.id },
+        //     where: { id: chat.identifiers[0].id },
         //     relations: ['User', 'Channel']
         // });
+        const chatWithUser = await this.channelchatsRepository
+            .createQueryBuilder('channelChat')
+            .innerJoin('channelChat.User', 'user')
+            .innerJoin('channelChat.Channel', 'channel')
+            .where('channelChat.id = :id', { id: chat.identifiers[0].id })
+            .getOne();
+        console.log('c:::', chatWithUser);
 
         // socket.io로 해당 워크스페이스 채널 사용자들에게 전송
-        // this.eventsGateway.server.to(`/ws-${url}-${channel.id}`).emit('message', chatWithUser);
+        this.eventsGateway.server.to(`/ws-${url}-${channel.id}`).emit('message', chatWithUser);
     }
 
     // transaction 관리 필요
@@ -243,6 +249,9 @@ export class ChannelsService {
             .where('channel.name = :name', { name })
             .getOne();
 
+        // after에 들어갈 수 계산 예시: 
+        // const timeFlag = new Date();
+        // timeFlag.setHours(timeFlag.getHours() - 2); -> 1641014793082 (식을 구한 시점으로부터 2시간 전 시간이 구해짐)
         return this.channelchatsRepository.count({ // COUNT(*)
             where: {
                 ChannelId: channel.id,
