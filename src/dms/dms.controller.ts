@@ -25,7 +25,7 @@ export class DmsController {
         private dmsService: DmsService
     ) {}
 
-    @ApiOperation({ summary: '워크스페이스 DM 모두 가져오기' })
+    @ApiOperation({ summary: '특정 워크스페이스에 내가 보낸 DM 모두 가져오기' })
     @Get(':url/dms')
     async getWorkspaceAllDMs(@Param('url') url: string, @GetUser() user: Users) {
         return this.dmsService.getWorkspaceAllDMs(url, user.id);
