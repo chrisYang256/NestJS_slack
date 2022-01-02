@@ -26,9 +26,9 @@ export class DmsService {
     async getWorkspaceAllDMs(url: string, myId: number) {
         return this.usersRepository
             .createQueryBuilder('user')
-            .leftJoin('user.dms', 'dms', 'dms.sensderId = :myId', { myId })
-            .leftJoin('dms', 'workspace', 'workspace.url = :url', { url })
-            .groupBy('dms.senderId')
+            .leftJoin('user.DMsS', 'dms', 'dms.senderId = :myId', { myId })
+            .leftJoin('dms.Workspace', 'workspace', 'workspace.url = :url', { url })
+            // .groupBy('dms.SenderId')
             .getMany();
     }
 

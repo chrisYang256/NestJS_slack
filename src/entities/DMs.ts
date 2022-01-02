@@ -22,7 +22,7 @@ export class DMs {
     @Column('int', { name: 'SenderId', nullable: true })
     SenderId: number | null;
 
-    @Column('int', { name: 'ReceiveId', nullable: true })
+    @Column('int', { name: 'ReceiverId', nullable: true })
     ReceiverId: number | null;
 
     @Column('int', { name: 'WorkspaceId', nullable: true })
