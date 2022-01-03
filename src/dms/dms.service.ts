@@ -8,7 +8,7 @@ import { onlineMap } from 'src/events/onlineMap';
 import { Repository } from 'typeorm';
 
 function getKeyByValue(object, value) {
-    return Object.keys(Object).find((key) => object[key] === value);
+    return Object.keys(object).find((key) => object[key] === value);
 }
 
 @Injectable()
@@ -24,12 +24,16 @@ export class DmsService {
     ) {}
 
     async getWorkspaceAllDMs(url: string, myId: number) {
-        return this.usersRepository
+        const myDMs = await this.usersRepository
             .createQueryBuilder('user')
-            .leftJoin('user.DMsS', 'dms', 'dms.senderId = :myId', { myId })
-            .leftJoin('dms.Workspace', 'workspace', 'workspace.url = :url', { url })
+            .leftJoin('user.DMsS', 'dm', 'dm.SenderId = :myId', { myId })
+            // .leftJoin('dms.Workspace', 'workspace', 'workspace.url = :url', { url })
             // .groupBy('dms.SenderId')
             .getMany();
+        console.log('myId::', myId);
+        console.log('myDMs::', myDMs);
+        
+        return myDMs;
     }
 
     async getWorkspaceDMChats(
@@ -75,11 +79,16 @@ export class DmsService {
             where: { id: dm.id },
             relations: ['Sender'],
         });
-        const receiveSocketId = getKeyByValue(
-            onlineMap[`\ws-${workspace.url}`],
+
+        const receiveSocketId = await getKeyByValue(
+            onlineMap[`/ws-${workspace.url}`],
             Number(counterpartId)
         );
-        this.eventsGateway.server.to(receiveSocketId).emit('dm', dmWithSender);
+        console.log('receiveSocketId:::', receiveSocketId)
+
+        this.eventsGateway.server
+            .to(receiveSocketId)
+            .emit('dm', dmWithSender);
     }
 
     async createWorkspaceDMImages(

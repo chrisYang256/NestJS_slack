@@ -20,6 +20,8 @@ import { ChannelsService } from './channels.service';
       ChannelChats,
       Users
     ]),
+    // EventsGateway를 담고 있는 EventsModule이 있기 때문에 provider에 넣으면 안됨!
+    // EventsGateway를 provider에 넣으면 class이기 때문에 작동할 때마다 new가 되서 새로운 인스턴스가 생성됨(새로운 서버가 생성됨)
     EventsModule,
   ]
 })

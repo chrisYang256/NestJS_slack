@@ -3,6 +3,7 @@
 
 import { ExecutionContext, Injectable } from "@nestjs/common";
 import { AuthGuard } from '@nestjs/passport';
+import e from "express";
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
@@ -14,6 +15,7 @@ export class LocalAuthGuard extends AuthGuard('local') {
             await super.logIn(request); // <- local startegy에서 return done이 되는 경우
         }
 
+        console.log(':::local-auth.guard');
         return true; // CanActivate의 반환값이 true일 때 다음으로 넘어갈 수 있음.
     }
 }
