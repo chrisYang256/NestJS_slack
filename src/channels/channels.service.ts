@@ -237,6 +237,8 @@ export class ChannelsService {
 
             this.eventsGateway.server // 1. socket.io로 
                 // .of(`/ws-${url})
+                // 프론트 쪽에서 이미 /ws-워크스페이스url-채널아이디 형식으로 구독을 하고 있음
+                // 그래서 이 채널에 있는 사람들에게 채팅 내용을 실시간으로 뿌려주는 것
                 .to(`/ws-${url}-${chatWithUser.ChannelId}`) // 2. 불러온 채팅정보로 해당 워크스페이스와 채널을 찾고
                 .emit('message', chatWithUser) // 3. 메시지로 전송
         }   

@@ -18,7 +18,7 @@ export class AuthService {
         where: { email },
         select: ['id', 'password', 'email', 'nickname'] // User entity에서 password를 select: false로 막아놨기 때문에 설정해줘야함.
     });
-    console.log('validateUser(auth.service):::', email, password, user)
+    console.log(':::auth.service');
 
     if (!user) {
       return null;

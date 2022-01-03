@@ -14,6 +14,7 @@ export class LocalSerializer extends PassportSerializer {
     }
 
     serializeUser(user: Users, done: CallableFunction) { // user정보 일부(id) sesiion에 저장
+        // console.log('local-serializer / done');
         done(null, user.id) 
     }
 
